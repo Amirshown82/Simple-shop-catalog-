@@ -1151,82 +1151,86 @@
   .scanner-overlay{
     position:fixed;
     top:0; left:0; right:0; bottom:0;
-    width:100%;
-    height:100%;
+    width:100vw;
+    height:100vh;
     height:100dvh;
     background:#000;
-    z-index:100;
+    z-index:9999;
     display:none;
     flex-direction:column;
+    overflow:hidden;
   }
   .scanner-overlay.open{display:flex;}
   .scanner-header{
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding:14px 16px;
-    padding-top:max(14px, env(safe-area-inset-top));
-    background:rgba(0,0,0,0.85);
+    padding:12px 16px;
+    padding-top:max(12px, env(safe-area-inset-top));
+    background:#111;
     color:#fff;
-    flex-shrink:0;
-    z-index:2;
+    flex:0 0 auto;
   }
   .scanner-header h3{margin:0; font-size:16px; font-weight:700;}
   .scanner-close{
-    width:36px;height:36px;
+    width:40px;height:40px;
     border-radius:10px;
     border:none;
-    background:rgba(255,255,255,0.15);
+    background:rgba(255,255,255,0.18);
     color:#fff;
-    font-size:20px;
+    font-size:22px;
     cursor:pointer;
     display:flex;align-items:center;justify-content:center;
   }
+  .scanner-body{
+    flex:1 1 auto;
+    min-height:0;
+    position:relative;
+    width:100%;
+    background:#000;
+  }
   #scannerReader{
-    position:absolute;
-    inset:0;
     width:100%;
     height:100%;
-    overflow:hidden;
-    background:#111;
+    min-height:280px;
+    background:#000;
   }
   #scannerReader video{
     width:100% !important;
     height:100% !important;
+    max-height:100% !important;
     object-fit:cover !important;
-    border:none !important;
+    display:block !important;
+    background:#000 !important;
   }
-  #scannerReader img{
-    object-fit:cover !important;
-  }
-  #scannerReader > div{
-    border:none !important;
+  #scannerReader canvas{
+    display:none !important;
   }
   .scanner-hint{
     padding:12px 16px;
-    padding-bottom:max(12px, env(safe-area-inset-bottom));
-    background:rgba(0,0,0,0.85);
-    color:#ccc;
+    padding-bottom:max(14px, env(safe-area-inset-bottom));
+    background:#111;
+    color:#ddd;
     font-size:13px;
     text-align:center;
-    flex-shrink:0;
-    z-index:2;
+    flex:0 0 auto;
   }
   .scanner-status{
     position:absolute;
-    inset:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:#aaa;
+    left:12px; right:12px; top:50%;
+    transform:translateY(-50%);
+    color:#fff;
     font-size:14px;
-    z-index:3;
-    pointer-events:none;
+    z-index:5;
     text-align:center;
-    padding:20px;
+    padding:16px;
     white-space:pre-line;
-    background:transparent;
+    line-height:1.7;
+    background:rgba(0,0,0,0.55);
+    border-radius:12px;
+    pointer-events:none;
   }
+  .scanner-status.hidden{display:none;}
   .barcode-field-row{
     display:flex;
     gap:8px;
@@ -1417,11 +1421,11 @@
     <h3>اسکن بارکد</h3>
     <button class="scanner-close" onclick="closeBarcodeScanner()">×</button>
   </div>
-  <div style="flex:1; min-height:0; position:relative; width:100%;">
+  <div class="scanner-body">
     <div id="scannerReader"></div>
-    <div class="scanner-status" id="scannerStatus">در حال باز کردن دوربین...</div>
+    <div class="scanner-status" id="scannerStatus">درخواست دسترسی دوربین...</div>
   </div>
-  <div class="scanner-hint">بارکد را افقی داخل کادر قرار دهید</div>
+  <div class="scanner-hint" id="scannerHint">اجازه دوربین را تأیید کن — بعد بارکد را روبه‌روی دوربین بگیر</div>
 </div>
 
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
@@ -3377,13 +3381,31 @@ document.getElementById('catPills').addEventListener('wheel', function(e){
 
 // ---- Barcode scanner (html5-qrcode) ----
 let html5QrCode = null;
-let scannerTarget = 'cart'; // 'cart' | 'form'
+let scannerTarget = 'cart';
 let scannerHandling = false;
 let scannerStarting = false;
 
-function setScannerStatus(msg){
+function setScannerStatus(msg, hide){
   const el = document.getElementById('scannerStatus');
-  if(el) el.textContent = msg || '';
+  if(!el) return;
+  if(hide){
+    el.classList.add('hidden');
+    return;
+  }
+  el.classList.remove('hidden');
+  el.textContent = msg || '';
+}
+
+function forceVideoVisible(){
+  const reader = document.getElementById('scannerReader');
+  if(!reader) return;
+  const video = reader.querySelector('video');
+  if(!video) return;
+  video.style.cssText = 'width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;background:#000!important;';
+  video.setAttribute('playsinline', 'true');
+  video.setAttribute('webkit-playsinline', 'true');
+  video.muted = true;
+  try{ video.play(); }catch(e){}
 }
 
 function openBarcodeScanner(target){
@@ -3391,27 +3413,27 @@ function openBarcodeScanner(target){
   scannerHandling = false;
 
   if(typeof Html5Qrcode === 'undefined'){
-    showToast('کتابخانه بارکدخوان لود نشده — اتصال اینترنت را چک کن');
+    showToast('کتابخانه بارکدخوان لود نشده — اینترنت را چک کن');
     return;
   }
-
   if(location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1'){
-    showToast('برای اسکن بارکد باید سایت با HTTPS باز شود');
+    showToast('باید با HTTPS باز شود');
     return;
   }
-
   if(scannerStarting) return;
   scannerStarting = true;
 
   document.getElementById('scannerOverlay').classList.add('open');
-  setScannerStatus('در حال باز کردن دوربین...');
+  setScannerStatus('درخواست دسترسی دوربین...\nاگر پنجره آمد، Allow را بزن');
+  document.getElementById('scannerHint').textContent = 'منتظر اجازه دوربین...';
 
-  // Wait until overlay is laid out so the camera container has real size
-  setTimeout(() => startScannerCamera(), 250);
+  // Give the overlay a moment to get real pixel size
+  requestAnimationFrame(() => {
+    setTimeout(() => startScannerCamera(), 300);
+  });
 }
 
 async function startScannerCamera(){
-  const statusEl = document.getElementById('scannerStatus');
   try{
     if(html5QrCode){
       try{
@@ -3422,57 +3444,62 @@ async function startScannerCamera(){
       html5QrCode = null;
     }
 
-    const reader = document.getElementById('scannerReader');
-    reader.innerHTML = '';
+    document.getElementById('scannerReader').innerHTML = '';
 
-    if(statusEl){
-      statusEl.style.display = 'flex';
-      statusEl.textContent = 'درخواست دسترسی به دوربین...';
-    }
-
-    // Explicit permission request so browser always shows the prompt
     if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-      setScannerStatus('این مرورگر از دوربین پشتیبانی نمی‌کند.\nبا Chrome باز کن.');
-      showToast('مرورگر از دوربین پشتیبانی نمی‌کند');
+      setScannerStatus('این مرورگر دوربین ندارد.\nبا Chrome باز کن.');
       return;
     }
 
-    let permissionStream = null;
+    // --- Step 1: force the browser permission dialog ---
+    setScannerStatus('درخواست دسترسی دوربین...\nاگر پنجره آمد، Allow را بزن');
+    let tempStream = null;
     try{
-      permissionStream = await navigator.mediaDevices.getUserMedia({
+      tempStream = await navigator.mediaDevices.getUserMedia({
         audio: false,
-        video: { facingMode: { ideal: 'environment' } }
+        video: true
       });
     }catch(permErr){
-      console.error('Camera permission error:', permErr);
-      const name = permErr && permErr.name ? permErr.name : '';
+      const name = (permErr && permErr.name) || '';
       if(name === 'NotAllowedError' || name === 'PermissionDeniedError'){
         setScannerStatus(
-          'اجازه دوربین داده نشده.\n\n' +
-          'در Chrome:\n' +
-          '۱. روی قفل کنار آدرس سایت بزن\n' +
-          '۲. Permissions / مجوزها\n' +
-          '۳. Camera را Allow کن\n' +
-          '۴. صفحه را رفرش کن و دوباره اسکن بزن'
+          'اجازه دوربین بسته است.\n\n' +
+          'Chrome → قفل کنار آدرس سایت\n' +
+          '→ Permissions → Camera → Allow\n' +
+          '→ رفرش صفحه → دوباره اسکن'
         );
-      }else if(name === 'NotFoundError' || name === 'DevicesNotFoundError'){
-        setScannerStatus('دوربینی روی این دستگاه پیدا نشد.');
-      }else if(name === 'NotReadableError' || name === 'TrackStartError'){
-        setScannerStatus('دوربین در حال استفاده توسط برنامه دیگری است.\nآن را ببند و دوباره تلاش کن.');
+      }else if(name === 'NotFoundError'){
+        setScannerStatus('دوربینی پیدا نشد.');
+      }else if(name === 'NotReadableError'){
+        setScannerStatus('دوربین مشغول است.\nبرنامه دیگر را ببند.');
       }else{
-        setScannerStatus('خطا در دسترسی به دوربین:\n' + (permErr.message || name || String(permErr)));
+        setScannerStatus('خطای دوربین:\n' + (permErr.message || name || String(permErr)));
       }
       showToast('اجازه دوربین لازم است');
       return;
     }
 
-    // Release temp stream — html5-qrcode opens its own
-    if(permissionStream){
-      permissionStream.getTracks().forEach(t => t.stop());
-      permissionStream = null;
+    // Keep tracks info, then stop temp stream so html5-qrcode can reopen
+    if(tempStream){
+      tempStream.getTracks().forEach(t => t.stop());
+      tempStream = null;
     }
 
-    if(statusEl) statusEl.textContent = 'در حال روشن کردن اسکنر...';
+    setScannerStatus('در حال پیدا کردن دوربین پشت...');
+    document.getElementById('scannerHint').textContent = 'دوربین در حال آماده‌سازی...';
+
+    // --- Step 2: pick rear camera by id when possible ---
+    let cameraIdOrConfig = { facingMode: 'environment' };
+    try{
+      const cameras = await Html5Qrcode.getCameras();
+      if(cameras && cameras.length){
+        // Prefer a camera whose label looks like the back/environment camera
+        const back = cameras.find(c => /back|rear|environment|behind|پشت/i.test(c.label || ''));
+        cameraIdOrConfig = (back || cameras[cameras.length - 1]).id;
+      }
+    }catch(e){
+      // fallback to facingMode object
+    }
 
     const formats = [
       Html5QrcodeSupportedFormats.EAN_13,
@@ -3489,27 +3516,29 @@ async function startScannerCamera(){
 
     const config = {
       fps: 12,
-      qrbox: function(viewfinderWidth, viewfinderHeight){
-        const w = Math.floor(viewfinderWidth * 0.86);
-        const h = Math.floor(Math.min(viewfinderHeight * 0.30, w * 0.38));
-        return { width: Math.max(w, 200), height: Math.max(h, 90) };
+      qrbox: function(w, h){
+        return {
+          width: Math.max(Math.floor(w * 0.88), 200),
+          height: Math.max(Math.floor(Math.min(h * 0.32, w * 0.4)), 90)
+        };
       }
     };
 
-    await html5QrCode.start(
-      { facingMode: 'environment' },
-      config,
-      onBarcodeScanned,
-      () => {}
-    );
+    setScannerStatus('در حال روشن کردن تصویر...');
+    await html5QrCode.start(cameraIdOrConfig, config, onBarcodeScanned, () => {});
 
-    if(statusEl) statusEl.style.display = 'none';
+    // Force the video element to actually paint
+    forceVideoVisible();
+    setTimeout(forceVideoVisible, 200);
+    setTimeout(forceVideoVisible, 600);
+
+    setScannerStatus('', true);
+    document.getElementById('scannerHint').textContent = 'بارکد را افقی روبه‌روی دوربین بگیر';
 
   }catch(err){
-    console.error('Scanner start error:', err);
-    const msg = (err && err.message) ? String(err.message) : String(err);
-    setScannerStatus('اسکنر روشن نشد.\n\n' + msg);
-    showToast('خطا در روشن کردن اسکنر');
+    console.error('Scanner error:', err);
+    setScannerStatus('اسکنر روشن نشد.\n\n' + ((err && err.message) || String(err)));
+    showToast('خطا در اسکنر');
   }finally{
     scannerStarting = false;
   }
@@ -3518,12 +3547,8 @@ async function startScannerCamera(){
 function onBarcodeScanned(decodedText){
   if(scannerHandling) return;
   scannerHandling = true;
-
   const code = String(decodedText).trim();
-  if(!code){
-    scannerHandling = false;
-    return;
-  }
+  if(!code){ scannerHandling = false; return; }
 
   if(navigator.vibrate) try{ navigator.vibrate(80); }catch(e){}
 
@@ -3554,25 +3579,19 @@ async function closeBarcodeScanner(){
   document.getElementById('scannerOverlay').classList.remove('open');
   scannerStarting = false;
   scannerHandling = false;
-
   if(html5QrCode){
     try{
       const state = html5QrCode.getState && html5QrCode.getState();
-      if(state === 2 || state === 3){
-        await html5QrCode.stop();
-      }
+      if(state === 2 || state === 3) await html5QrCode.stop();
     }catch(e){}
     try{ html5QrCode.clear(); }catch(e){}
     html5QrCode = null;
   }
-
   const reader = document.getElementById('scannerReader');
   if(reader) reader.innerHTML = '';
-  const statusEl = document.getElementById('scannerStatus');
-  if(statusEl){
-    statusEl.style.display = 'flex';
-    statusEl.textContent = 'در حال باز کردن دوربین...';
-  }
+  setScannerStatus('درخواست دسترسی دوربین...');
+  const hint = document.getElementById('scannerHint');
+  if(hint) hint.textContent = 'اجازه دوربین را تأیید کن — بعد بارکد را روبه‌روی دوربین بگیر';
 }
 
 loadProducts();
