@@ -3507,21 +3507,29 @@ async function startScannerCamera(){
       Html5QrcodeSupportedFormats.UPC_A,
       Html5QrcodeSupportedFormats.UPC_E,
       Html5QrcodeSupportedFormats.CODE_128,
-      Html5QrcodeSupportedFormats.CODE_39
+      Html5QrcodeSupportedFormats.CODE_39,
+      Html5QrcodeSupportedFormats.QR_CODE
     ];
     html5QrCode = new Html5Qrcode('scannerReader', {
       formatsToSupport: formats,
-      verbose: false
+      verbose: false,
+      // Native BarcodeDetector on Chrome/Android is MUCH better for 1D barcodes
+      experimentalFeatures: {
+        useBarCodeDetectorIfSupported: true
+      }
     });
 
+    // Large scan region — small boxes make 1D barcodes almost impossible to hit
     const config = {
-      fps: 12,
+      fps: 15,
       qrbox: function(w, h){
         return {
-          width: Math.max(Math.floor(w * 0.88), 200),
-          height: Math.max(Math.floor(Math.min(h * 0.32, w * 0.4)), 90)
+          width: Math.floor(w * 0.92),
+          height: Math.floor(h * 0.45)
         };
-      }
+      },
+      aspectRatio: 1.777778,
+      disableFlip: false
     };
 
     setScannerStatus('در حال روشن کردن تصویر...');
@@ -3533,7 +3541,7 @@ async function startScannerCamera(){
     setTimeout(forceVideoVisible, 600);
 
     setScannerStatus('', true);
-    document.getElementById('scannerHint').textContent = 'بارکد را افقی روبه‌روی دوربین بگیر';
+    document.getElementById('scannerHint').textContent = 'بارکد را افقی و کامل داخل کادر روشن بگیر — کمی دور/نزدیک کن';
 
   }catch(err){
     console.error('Scanner error:', err);
