@@ -3411,9 +3411,8 @@ function openBarcodeScanner(target){
 }
 
 async function startScannerCamera(){
+  const statusEl = document.getElementById('scannerStatus');
   try{
-    // Always recreate instance on a clean container — avoids black screen
-    // from leftover DOM nodes after previous stop/clear cycles.
     if(html5QrCode){
       try{
         const st = html5QrCode.getState && html5QrCode.getState();
@@ -3426,11 +3425,54 @@ async function startScannerCamera(){
     const reader = document.getElementById('scannerReader');
     reader.innerHTML = '';
 
-    const statusEl = document.getElementById('scannerStatus');
     if(statusEl){
       statusEl.style.display = 'flex';
-      statusEl.textContent = 'در حال باز کردن دوربین...';
+      statusEl.textContent = 'درخواست دسترسی به دوربین...';
     }
+
+    // Explicit permission request so browser always shows the prompt
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      setScannerStatus('این مرورگر از دوربین پشتیبانی نمی‌کند.\nبا Chrome باز کن.');
+      showToast('مرورگر از دوربین پشتیبانی نمی‌کند');
+      return;
+    }
+
+    let permissionStream = null;
+    try{
+      permissionStream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: { facingMode: { ideal: 'environment' } }
+      });
+    }catch(permErr){
+      console.error('Camera permission error:', permErr);
+      const name = permErr && permErr.name ? permErr.name : '';
+      if(name === 'NotAllowedError' || name === 'PermissionDeniedError'){
+        setScannerStatus(
+          'اجازه دوربین داده نشده.\n\n' +
+          'در Chrome:\n' +
+          '۱. روی قفل کنار آدرس سایت بزن\n' +
+          '۲. Permissions / مجوزها\n' +
+          '۳. Camera را Allow کن\n' +
+          '۴. صفحه را رفرش کن و دوباره اسکن بزن'
+        );
+      }else if(name === 'NotFoundError' || name === 'DevicesNotFoundError'){
+        setScannerStatus('دوربینی روی این دستگاه پیدا نشد.');
+      }else if(name === 'NotReadableError' || name === 'TrackStartError'){
+        setScannerStatus('دوربین در حال استفاده توسط برنامه دیگری است.\nآن را ببند و دوباره تلاش کن.');
+      }else{
+        setScannerStatus('خطا در دسترسی به دوربین:\n' + (permErr.message || name || String(permErr)));
+      }
+      showToast('اجازه دوربین لازم است');
+      return;
+    }
+
+    // Release temp stream — html5-qrcode opens its own
+    if(permissionStream){
+      permissionStream.getTracks().forEach(t => t.stop());
+      permissionStream = null;
+    }
+
+    if(statusEl) statusEl.textContent = 'در حال روشن کردن اسکنر...';
 
     const formats = [
       Html5QrcodeSupportedFormats.EAN_13,
@@ -3445,7 +3487,6 @@ async function startScannerCamera(){
       verbose: false
     });
 
-    // Wide box for 1D barcodes
     const config = {
       fps: 12,
       qrbox: function(viewfinderWidth, viewfinderHeight){
@@ -3455,7 +3496,6 @@ async function startScannerCamera(){
       }
     };
 
-    // Simplest rear-camera constraint — most reliable on Android Chrome
     await html5QrCode.start(
       { facingMode: 'environment' },
       config,
@@ -3468,8 +3508,8 @@ async function startScannerCamera(){
   }catch(err){
     console.error('Scanner start error:', err);
     const msg = (err && err.message) ? String(err.message) : String(err);
-    setScannerStatus('دوربین باز نشد.\nاجازه دوربین را در تنظیمات مرورگر فعال کن.\n\n' + msg);
-    showToast('دسترسی به دوربین ممکن نیست');
+    setScannerStatus('اسکنر روشن نشد.\n\n' + msg);
+    showToast('خطا در روشن کردن اسکنر');
   }finally{
     scannerStarting = false;
   }
