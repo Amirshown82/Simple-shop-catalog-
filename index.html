@@ -694,6 +694,218 @@
   }
   .err{color:var(--danger); font-size:12px; margin-top:4px; display:none;}
 
+  .checkout-summary-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 2px;
+    font-size:13.5px;
+    color:var(--ink-soft);
+  }
+  .checkout-summary-value{
+    font-family:var(--mono);
+    font-weight:600;
+    color:var(--ink);
+    font-variant-numeric:tabular-nums;
+  }
+  .checkout-final-row{
+    border-top:1px dashed var(--line);
+    margin-top:4px;
+    padding-top:14px;
+    font-size:14.5px;
+    font-weight:700;
+    color:var(--ink);
+  }
+  .checkout-final-value{
+    font-size:19px;
+    color:#1f8a4c;
+  }
+
+  .report-stats-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    margin:14px 0;
+  }
+  .report-stat{
+    background:var(--bg);
+    border-radius:10px;
+    padding:9px 11px;
+  }
+  .report-stat-label{
+    font-size:10.5px;
+    color:var(--ink-soft);
+    margin-bottom:3px;
+  }
+  .report-stat-value{
+    font-family:var(--mono);
+    font-weight:700;
+    font-size:14px;
+    color:var(--ink);
+    font-variant-numeric:tabular-nums;
+  }
+  .report-stat.profit-stat{
+    grid-column:1 / -1;
+    background:var(--accent-soft);
+  }
+  .report-stat.profit-stat .report-stat-value{
+    color:var(--accent);
+    font-size:16px;
+  }
+  .report-stat.profit-stat .report-stat-label{
+    color:var(--accent);
+  }
+
+  .bulk-select-all-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:8px;
+    padding:0 2px;
+  }
+  .bulk-checkbox-label{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:13.5px;
+    font-weight:600;
+    cursor:pointer;
+    color:var(--ink);
+  }
+  .bulk-checkbox-label input[type="checkbox"]{
+    width:17px;
+    height:17px;
+    accent-color:var(--accent);
+  }
+  .bulk-selected-count{
+    font-size:12px;
+    color:var(--ink-soft);
+    font-family:var(--mono);
+  }
+  .bulk-list{
+    max-height:260px;
+    overflow-y:auto;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:4px;
+    margin-bottom:6px;
+  }
+  .bulk-item-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:9px 8px;
+    border-radius:8px;
+    cursor:pointer;
+  }
+  .bulk-item-row:hover{background:var(--bg);}
+  .bulk-item-row input[type="checkbox"]{
+    width:16px;
+    height:16px;
+    flex-shrink:0;
+    accent-color:var(--accent);
+  }
+  .bulk-item-name{
+    flex:1;
+    font-size:13px;
+    color:var(--ink);
+  }
+  .bulk-item-price{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--ink-soft);
+    flex-shrink:0;
+  }
+  .bulk-mode-tabs{
+    display:flex;
+    gap:6px;
+    margin:14px 0 10px;
+  }
+  .bulk-mode-btn{
+    flex:1;
+    padding:9px;
+    border-radius:9px;
+    border:1px solid var(--line);
+    background:var(--bg);
+    font-family:var(--sans);
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--ink-soft);
+    cursor:pointer;
+  }
+  .bulk-mode-btn.active{
+    background:var(--ink);
+    color:#fff;
+    border-color:var(--ink);
+  }
+
+  .barcode-row{
+    display:flex;
+    gap:8px;
+  }
+  .barcode-row input{
+    flex:1;
+    border:1px solid var(--line);
+    border-radius:9px;
+    padding:10px 12px;
+    font-family:var(--sans);
+    font-size:14px;
+    background:var(--bg);
+    outline:none;
+  }
+  .barcode-row input:focus{border-color:var(--accent);}
+  .scan-icon-btn{
+    width:42px;
+    height:42px;
+    flex-shrink:0;
+    border-radius:9px;
+    background:var(--ink);
+    color:#fff;
+    border:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+  }
+  .scan-icon-btn:hover{background:#000;}
+  .scan-icon-btn:active{transform:scale(0.95);}
+  .search-scan-btn{
+    width:34px;
+    height:34px;
+    flex-shrink:0;
+    border-radius:8px;
+  }
+
+  .scanner-video-wrap{
+    position:relative;
+    width:100%;
+    aspect-ratio:4/3;
+    background:#000;
+    border-radius:12px;
+    overflow:hidden;
+    margin-bottom:10px;
+  }
+  .scanner-video-wrap video{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .scanner-frame{
+    position:absolute;
+    top:28%; left:8%; right:8%; bottom:28%;
+    border:2px solid #fff;
+    border-radius:10px;
+    box-shadow:0 0 0 999px rgba(0,0,0,0.35);
+    pointer-events:none;
+  }
+  .scanner-status{
+    text-align:center;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    min-height:16px;
+  }
+
   .stock-display{
     font-family:var(--mono);
     font-size:20px;
@@ -724,6 +936,53 @@
   .hist-out{background:var(--accent-soft); color:var(--accent);}
   .hist-adjust{background:var(--warn-soft); color:var(--warn);}
   .history-row-bottom{display:flex; justify-content:space-between; font-size:12px; color:var(--ink-soft); font-family:var(--mono);}
+
+  .txn-row{border-bottom:1px solid var(--line); padding:12px 2px;}
+  .txn-row:last-child{border-bottom:none;}
+  .txn-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:8px;
+  }
+  .txn-time{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+  .txn-total{
+    font-family:var(--mono);
+    font-weight:700;
+    font-size:14px;
+    color:var(--ink);
+  }
+  .txn-items{
+    background:var(--bg);
+    border-radius:9px;
+    padding:8px 10px;
+  }
+  .txn-item-line{
+    display:flex;
+    justify-content:space-between;
+    font-size:12.5px;
+    padding:3px 0;
+  }
+  .txn-item-name{color:var(--ink);}
+  .txn-item-calc{
+    font-family:var(--mono);
+    color:var(--ink-soft);
+    font-variant-numeric:tabular-nums;
+  }
+  .txn-count-badge{
+    font-family:var(--mono);
+    font-size:11px;
+    font-weight:600;
+    color:var(--ink-soft);
+    background:var(--paper);
+    padding:2px 8px;
+    border-radius:20px;
+    border:1px solid var(--line);
+  }
 
   .toast{
     position:fixed;
@@ -760,6 +1019,7 @@
     flex-shrink:0;
   }
   .menu-btn:hover{background:var(--bg);}
+  .menu-btn.voice-muted{color:var(--ink-soft); opacity:0.55;}
 
   .sidebar-overlay{
     position:fixed; inset:0;
@@ -953,6 +1213,15 @@
       <button class="menu-btn" onclick="requestNotifPermission()" title="فعال‌سازی یادآوری انقضا">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       </button>
+      <button class="menu-btn" id="voiceToggleBtn" onclick="toggleVoice()" title="خواندن جمع کل با صدا">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+      </button>
+      <button class="menu-btn" onclick="openTransactionsModal()" title="تراکنش‌ها">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h16v18l-3-2-3 2-3-2-3 2-3-2-1 2Z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+      </button>
+      <button class="menu-btn" onclick="openBulkPriceModal()" title="تغییر قیمت گروهی">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      </button>
       <button class="add-btn" onclick="openAddModal()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
         افزودن محصول
@@ -979,6 +1248,9 @@
   <div class="search-bar">
     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
     <input type="text" id="searchInput" placeholder="جستجوی محصول..." oninput="renderGrid()">
+    <button class="scan-icon-btn search-scan-btn" onclick="scanForSale()" title="اسکن بارکد برای افزودن به سبد">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M3 17v2a2 2 0 0 0 2 2h2M21 7V5a2 2 0 0 0-2-2h-2M21 17v2a2 2 0 0 1-2 2h-2M7 8v8M11 8v8M15 8v8M19 8v8" stroke-linecap="butt"/></svg>
+    </button>
   </div>
 
   <div class="cat-pills" id="catPills"></div>
@@ -1002,7 +1274,7 @@
       </div>
       <div class="receipt-total"><span id="receiptTotal">۰</span><small>تومان</small></div>
     </div>
-    <button class="checkout-btn" onclick="registerStockExit()">✅ ثبت خروج از موجودی</button>
+    <button class="checkout-btn" onclick="openCheckoutConfirm()">✅ ثبت خروج از موجودی</button>
     <div class="receipt-details" id="receiptDetails">
       <div id="receiptLines"></div>
       <span class="clear-btn" onclick="clearSelection(event)">پاک کردن انتخاب‌ها</span>
@@ -1032,6 +1304,15 @@
       <div class="err" id="nameErr">نام محصول را وارد کن</div>
     </div>
     <div class="field">
+      <label>بارکد (اختیاری)</label>
+      <div class="barcode-row">
+        <input type="text" id="prodBarcode" placeholder="بارکد محصول" onkeydown="handleFieldEnter(event, 'prodBarcode')">
+        <button class="scan-icon-btn" onclick="scanForProductForm()" title="اسکن بارکد با دوربین">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M3 17v2a2 2 0 0 0 2 2h2M21 7V5a2 2 0 0 0-2-2h-2M21 17v2a2 2 0 0 1-2 2h-2M7 8v8M11 8v8M15 8v8M19 8v8" stroke-linecap="butt"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="field">
       <label>دسته‌بندی (اختیاری)</label>
       <input type="text" id="prodCategory" list="categoryList" placeholder="مثلاً پوشاک" onkeydown="handleFieldEnter(event, 'prodCategory')">
       <datalist id="categoryList"></datalist>
@@ -1040,6 +1321,10 @@
       <label>قیمت (تومان)</label>
       <input type="text" inputmode="decimal" id="prodPrice" placeholder="0" oninput="normalizeDigits(this)" onkeydown="handleFieldEnter(event, 'prodPrice')">
       <div class="err" id="priceErr">قیمت معتبر وارد کن</div>
+    </div>
+    <div class="field">
+      <label>قیمت خرید (اختیاری — برای محاسبه سود)</label>
+      <input type="text" inputmode="decimal" id="prodCostPrice" placeholder="0" oninput="normalizeDigits(this)" onkeydown="handleFieldEnter(event, 'prodCostPrice')">
     </div>
     <div class="field">
       <label>موجودی فعلی (اختیاری)</label>
@@ -1155,6 +1440,30 @@
   </div>
 </div>
 
+<!-- Checkout confirm modal (discount entry before finalizing a sale) -->
+<div class="overlay" id="checkoutConfirmOverlay">
+  <div class="modal">
+    <h2>تایید فروش</h2>
+    <div class="checkout-summary-row">
+      <span>مجموع</span>
+      <span id="checkoutGrossDisplay" class="checkout-summary-value">۰ تومان</span>
+    </div>
+    <div class="field">
+      <label>تخفیف (مبلغ ثابت، تومان)</label>
+      <input type="text" inputmode="decimal" id="checkoutDiscountInput" placeholder="0" oninput="normalizeDigits(this); updateCheckoutPreview()">
+      <div class="err" id="discountErr">تخفیف نمی‌تواند منفی یا بیشتر از مبلغ کل باشد</div>
+    </div>
+    <div class="checkout-summary-row checkout-final-row">
+      <span>قابل پرداخت</span>
+      <span id="checkoutNetDisplay" class="checkout-summary-value checkout-final-value">۰ تومان</span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeCheckoutConfirm()">انصراف</button>
+      <button class="btn-primary" onclick="confirmCheckout()">✅ ثبت نهایی فروش</button>
+    </div>
+  </div>
+</div>
+
 <!-- Stock history modal -->
 <div class="overlay" id="historyOverlay">
   <div class="modal">
@@ -1162,6 +1471,72 @@
     <div class="history-list" id="historyList"></div>
     <div class="modal-actions">
       <button class="btn-secondary" style="width:100%;" onclick="closeHistoryModal()">بستن</button>
+    </div>
+  </div>
+</div>
+
+<!-- Transactions (receipts) modal -->
+<div class="overlay" id="transactionsOverlay">
+  <div class="modal">
+    <h2>تراکنش‌ها</h2>
+    <div class="report-stats-grid" id="todaySummary"></div>
+    <div class="history-list" id="transactionsList"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" style="width:100%;" onclick="closeTransactionsModal()">بستن</button>
+    </div>
+  </div>
+</div>
+
+<!-- Barcode scanner modal -->
+<div class="overlay" id="scannerOverlay">
+  <div class="modal" style="max-width:380px;">
+    <h2>اسکن بارکد</h2>
+    <div class="scanner-video-wrap">
+      <video id="scannerVideo" playsinline muted></video>
+      <div class="scanner-frame"></div>
+    </div>
+    <div class="scanner-status" id="scannerStatus">دوربین رو روی بارکد بگیر...</div>
+    <div class="modal-actions">
+      <button class="btn-secondary" style="width:100%;" onclick="closeScannerModal()">انصراف</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bulk price change modal -->
+<div class="overlay" id="bulkPriceOverlay">
+  <div class="modal">
+    <h2>تغییر قیمت گروهی</h2>
+
+    <div class="search-bar" style="margin-bottom:10px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" id="bulkSearchInput" placeholder="جستجوی محصول..." oninput="renderBulkProductList()">
+    </div>
+
+    <div class="bulk-select-all-row">
+      <label class="bulk-checkbox-label">
+        <input type="checkbox" id="bulkSelectAll" onchange="toggleBulkSelectAll()">
+        <span>انتخاب همه</span>
+      </label>
+      <span class="bulk-selected-count" id="bulkSelectedCount">۰ محصول انتخاب شده</span>
+    </div>
+
+    <div class="bulk-list" id="bulkList"></div>
+
+    <div class="field-divider"></div>
+
+    <div class="bulk-mode-tabs">
+      <button class="bulk-mode-btn active" id="bulkModeSet" onclick="setBulkMode('set')">قیمت ثابت</button>
+      <button class="bulk-mode-btn" id="bulkModeInc" onclick="setBulkMode('increase')">افزایش</button>
+      <button class="bulk-mode-btn" id="bulkModeDec" onclick="setBulkMode('decrease')">کاهش</button>
+    </div>
+    <div class="field">
+      <label id="bulkValueLabel">قیمت جدید (تومان)</label>
+      <input type="text" inputmode="decimal" id="bulkValueInput" placeholder="0" oninput="normalizeDigits(this)">
+    </div>
+    <button class="btn-primary" style="width:100%; margin-bottom:8px;" onclick="applyBulkPriceChange()">اعمال تغییرات</button>
+
+    <div class="modal-actions">
+      <button class="btn-secondary" style="width:100%;" onclick="closeBulkPriceModal()">بستن</button>
     </div>
   </div>
 </div>
@@ -1182,7 +1557,7 @@
         <input type="file" accept="application/json,.json" style="display:none" onchange="importBackup(event)">
       </label>
       <div style="font-size:11.5px; color:var(--ink-soft); margin-top:8px; line-height:1.7;">
-        ⚠️ بازیابی، تمام اطلاعات فعلی همین دستگاه (محصولات و تاریخچه موجودی) رو با محتوای فایل جایگزین می‌کنه.
+        ⚠️ بازیابی، تمام اطلاعات فعلی همین دستگاه (محصولات، تاریخچه موجودی و تراکنش‌ها) رو با محتوای فایل جایگزین می‌کنه.
       </div>
     </div>
     <div class="modal-actions">
@@ -1207,8 +1582,12 @@ const LOWSTOCK_KEY = '📦 کم‌موجود';
 let stockBannerDismissedForSession = false;
 let stockModalTargetId = null;
 let lastUpdatedId = null;
+let voiceEnabled = true;
+const VOICE_KEY = 'catalog-voice-enabled';
 let stockHistory = [];
 const HISTORY_KEY = 'catalog-stock-history';
+let transactions = [];
+const TRANSACTIONS_KEY = 'catalog-transactions';
 
 const STORAGE_KEY = 'catalog-products';
 
@@ -1366,7 +1745,7 @@ function normalizeDigits(input){
   input.value = val;
 }
 
-const PRODUCT_FORM_FIELD_ORDER = ['prodName','prodCategory','prodPrice','prodStock','prodMinStock','expDay','expMonth','expYear','prodReminderDays'];
+const PRODUCT_FORM_FIELD_ORDER = ['prodName','prodBarcode','prodCategory','prodPrice','prodCostPrice','prodStock','prodMinStock','expDay','expMonth','expYear','prodReminderDays'];
 
 function handleFieldEnter(event, currentId){
   if(event.key !== 'Enter') return;
@@ -1414,6 +1793,73 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'), 1800);
 }
 
+// ---- Voice output (speak the total after checkout) ----
+function loadVoiceSetting(){
+  try{
+    const raw = localStorage.getItem(VOICE_KEY);
+    voiceEnabled = raw === null ? true : raw === 'true';
+  }catch(e){
+    voiceEnabled = true;
+  }
+  updateVoiceButton();
+}
+
+function toggleVoice(){
+  voiceEnabled = !voiceEnabled;
+  try{ localStorage.setItem(VOICE_KEY, String(voiceEnabled)); }catch(e){}
+  updateVoiceButton();
+  showToast(voiceEnabled ? 'صدای جمع کل فعال شد 🔊' : 'صدای جمع کل خاموش شد 🔇');
+}
+
+function updateVoiceButton(){
+  const btn = document.getElementById('voiceToggleBtn');
+  if(!btn) return;
+  btn.classList.toggle('voice-muted', !voiceEnabled);
+  btn.title = voiceEnabled ? 'خواندن جمع کل با صدا (فعال)' : 'خواندن جمع کل با صدا (خاموش)';
+}
+
+let cachedVoices = [];
+let faVoiceMissingWarned = false;
+
+function refreshVoiceList(){
+  if(typeof speechSynthesis === 'undefined') return;
+  cachedVoices = speechSynthesis.getVoices();
+}
+if(typeof speechSynthesis !== 'undefined'){
+  refreshVoiceList();
+  speechSynthesis.onvoiceschanged = refreshVoiceList;
+}
+
+function getPersianVoice(){
+  return cachedVoices.find(v => v.lang && v.lang.toLowerCase().startsWith('fa')) || null;
+}
+
+function speakTotal(amount){
+  if(!voiceEnabled) return;
+  if(typeof speechSynthesis === 'undefined' || typeof SpeechSynthesisUtterance === 'undefined') return;
+  try{
+    speechSynthesis.cancel();
+    const rounded = Math.round(amount);
+    const utter = new SpeechSynthesisUtterance(`جمع کل: ${rounded} تومان`);
+    const faVoice = getPersianVoice();
+    if(faVoice){
+      utter.voice = faVoice;
+      utter.lang = faVoice.lang;
+    }else{
+      utter.lang = 'fa-IR';
+      if(!faVoiceMissingWarned){
+        faVoiceMissingWarned = true;
+        showToast('صدای فارسی روی این دستگاه نصب نیست، با صدای پیش‌فرض خوند');
+      }
+    }
+    utter.rate = 0.95;
+    speechSynthesis.speak(utter);
+  }catch(e){
+    // speech synthesis unsupported on this browser — fail silently,
+    // the on-screen total and toast still show the amount either way
+  }
+}
+
 // ---- Inventory (stock) helpers ----
 async function loadStockHistory(){
   try{
@@ -1440,6 +1886,42 @@ function pushHistory(entry){
     id: 'h_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
     time: new Date().toISOString()
   }, entry));
+}
+
+// ---- Transactions (sale receipts) ----
+async function loadTransactions(){
+  try{
+    const raw = localStorage.getItem(TRANSACTIONS_KEY);
+    transactions = raw ? JSON.parse(raw) : [];
+  }catch(e){
+    transactions = [];
+  }
+}
+
+async function persistTransactions(){
+  try{
+    if(transactions.length > 200){
+      transactions = transactions.slice(transactions.length - 200);
+    }
+    localStorage.setItem(TRANSACTIONS_KEY, JSON.stringify(transactions));
+  }catch(e){
+    showToast('خطا در ذخیره‌سازی تراکنش‌ها');
+  }
+}
+
+function pushTransaction(items, total, extra){
+  extra = extra || {};
+  transactions.push({
+    id: 'tx_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
+    time: new Date().toISOString(),
+    items,
+    total,
+    grossTotal: (extra.grossTotal !== undefined) ? extra.grossTotal : total,
+    discount: extra.discount || 0,
+    costOfGoods: (extra.costOfGoods !== undefined) ? extra.costOfGoods : null,
+    profit: (extra.profit !== undefined) ? extra.profit : null,
+    hasUnknownCost: !!extra.hasUnknownCost
+  });
 }
 
 function getStock(p){ return Number(p.stock) || 0; }
@@ -2039,8 +2521,10 @@ function openAddModal(keepCategory){
   currentImageData = null;
   document.getElementById('modalTitle').textContent = 'افزودن محصول';
   document.getElementById('prodName').value = '';
+  document.getElementById('prodBarcode').value = '';
   document.getElementById('prodCategory').value = prevCategory;
   document.getElementById('prodPrice').value = '';
+  document.getElementById('prodCostPrice').value = '';
   document.getElementById('prodStock').value = '0';
   document.getElementById('prodMinStock').value = '0';
   renderJalaliSelectors(null, null, null);
@@ -2063,8 +2547,10 @@ function openEditModal(id, focusField){
   currentImageData = p.image || null;
   document.getElementById('modalTitle').textContent = 'ویرایش محصول';
   document.getElementById('prodName').value = p.name;
+  document.getElementById('prodBarcode').value = p.barcode || '';
   document.getElementById('prodCategory').value = p.category || '';
   document.getElementById('prodPrice').value = p.price;
+  document.getElementById('prodCostPrice').value = (p.costPrice !== undefined && p.costPrice !== null) ? p.costPrice : '';
   document.getElementById('prodStock').value = String(getStock(p));
   document.getElementById('prodMinStock').value = String(getMinStock(p));
 
@@ -2137,9 +2623,12 @@ function handleImageUpload(event){
 
 async function saveProduct(keepOpen){
   const name = document.getElementById('prodName').value.trim();
+  const barcode = document.getElementById('prodBarcode').value.trim();
   const category = document.getElementById('prodCategory').value.trim();
   const priceStr = document.getElementById('prodPrice').value;
   const price = parseFloat(priceStr);
+  const costPriceStr = document.getElementById('prodCostPrice').value.trim();
+  const costPrice = (costPriceStr !== '' && !isNaN(parseFloat(costPriceStr))) ? parseFloat(costPriceStr) : null;
   const stockStr = document.getElementById('prodStock').value.trim();
   const minStockStr = document.getElementById('prodMinStock').value.trim();
   const stock = (stockStr !== '' && !isNaN(Number(stockStr))) ? Math.max(0, Math.floor(Number(stockStr))) : 0;
@@ -2171,8 +2660,10 @@ async function saveProduct(keepOpen){
     const p = products.find(pr => pr.id === editingId);
     const prevStock = getStock(p);
     p.name = name;
+    p.barcode = barcode;
     p.category = category;
     p.price = price;
+    p.costPrice = costPrice;
     p.image = currentImageData;
     p.expiryDate = expiryDate;
     p.reminderDays = reminderDays;
@@ -2185,7 +2676,7 @@ async function saveProduct(keepOpen){
   }else{
     const newProduct = {
       id: 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
-      name, category, price,
+      name, barcode, category, price, costPrice,
       image: currentImageData,
       expiryDate, reminderDays,
       stock, minStock
@@ -2346,8 +2837,121 @@ function renderHistoryList(){
   }).join('');
 }
 
+// ---- Transactions (sale receipts) modal ----
+function openTransactionsModal(){
+  renderTransactionsList();
+  document.getElementById('transactionsOverlay').classList.add('open');
+}
+
+function closeTransactionsModal(){
+  document.getElementById('transactionsOverlay').classList.remove('open');
+}
+
+function renderTodaySummary(){
+  const now = new Date();
+  const j = gregorianToJalali(now.getFullYear(), now.getMonth()+1, now.getDate());
+  const todayKey = j[0] + '-' + pad2(j[1]) + '-' + pad2(j[2]);
+  const todayTxns = transactions.filter(txn => isoToJalaliDateKey(txn.time) === todayKey);
+
+  const el = document.getElementById('todaySummary');
+  if(todayTxns.length === 0){
+    el.innerHTML = '';
+    return;
+  }
+
+  let netSum = 0, cogsSum = 0, anyUnknownCost = false;
+  todayTxns.forEach(txn => {
+    const f = getTxnFinancials(txn);
+    netSum += f.net;
+    if(f.cogs !== null) cogsSum += f.cogs;
+    if(f.unknownCost) anyUnknownCost = true;
+  });
+  const profitSum = netSum - cogsSum;
+  const profitLabel = (anyUnknownCost ? '~ ' : '') + toFa(Math.round(profitSum)) + ' تومان';
+
+  el.innerHTML = `
+    <div class="report-stat">
+      <div class="report-stat-label">فروش امروز</div>
+      <div class="report-stat-value">${toFa(netSum)} تومان</div>
+    </div>
+    <div class="report-stat profit-stat">
+      <div class="report-stat-label">سود امروز ${anyUnknownCost ? '(تقریبی — برخی کالاها قیمت خرید ندارند)' : ''}</div>
+      <div class="report-stat-value">${profitLabel}</div>
+    </div>
+  `;
+}
+
+function renderTransactionsList(){
+  renderTodaySummary();
+  const el = document.getElementById('transactionsList');
+  if(transactions.length === 0){
+    el.innerHTML = `<div class="sidebar-empty">هنوز تراکنشی ثبت نشده</div>`;
+    return;
+  }
+  const items = [...transactions].reverse();
+  el.innerHTML = items.map(txn => {
+    const f = getTxnFinancials(txn);
+    const itemCount = (txn.items || []).reduce((s, it) => s + (it.qty || 0), 0);
+    const itemLines = (txn.items || []).map(it => `
+      <div class="txn-item-line">
+        <span class="txn-item-name">${escapeHtml(it.name)}</span>
+        <span class="txn-item-calc">${toFa(it.qty)} × ${toFa(it.unitPrice)} = ${toFa(it.subtotal)}</span>
+      </div>`).join('');
+    const discountLine = f.discount > 0 ? `
+      <div class="txn-item-line">
+        <span class="txn-item-name">تخفیف</span>
+        <span class="txn-item-calc">− ${toFa(f.discount)}</span>
+      </div>` : '';
+    const profitLine = `
+      <div class="txn-item-line">
+        <span class="txn-item-name">سود این فروش</span>
+        <span class="txn-item-calc">${f.unknownCost ? 'نامشخص (قیمت خرید ثبت نشده)' : toFa(Math.round(f.profit)) + ' تومان'}</span>
+      </div>`;
+    return `<div class="txn-row">
+      <div class="txn-head">
+        <span class="txn-time">${formatHistoryTime(txn.time)}</span>
+        <span class="txn-count-badge">${toFa(itemCount)} قلم</span>
+        <span class="txn-total">${toFa(f.net)} تومان</span>
+      </div>
+      <div class="txn-items">${itemLines}${discountLine}${profitLine}</div>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('transactionsOverlay').addEventListener('click', (e)=>{
+  if(e.target.id === 'transactionsOverlay') closeTransactionsModal();
+});
+
+// ---- Transaction helpers (date grouping + safe financial fallbacks) ----
+function isoToJalaliDateKey(iso){
+  const d = new Date(iso);
+  const j = gregorianToJalali(d.getFullYear(), d.getMonth()+1, d.getDate());
+  return j[0] + '-' + pad2(j[1]) + '-' + pad2(j[2]);
+}
+
+// Reads a transaction's financial fields with safe fallbacks, so
+// transactions saved before discount/cost tracking existed still
+// render correctly instead of showing undefined/NaN.
+function getTxnFinancials(txn){
+  const gross = (txn.grossTotal !== undefined && txn.grossTotal !== null) ? txn.grossTotal : txn.total;
+  const discount = txn.discount || 0;
+  const net = (txn.total !== undefined && txn.total !== null) ? txn.total : Math.max(0, gross - discount);
+  const cogs = (txn.costOfGoods !== undefined && txn.costOfGoods !== null) ? txn.costOfGoods : null;
+  const unknownCost = !!txn.hasUnknownCost || cogs === null;
+  const profit = (txn.profit !== undefined && txn.profit !== null) ? txn.profit : (cogs !== null ? (net - cogs) : null);
+  return { gross, discount, net, cogs, unknownCost, profit };
+}
+
 // ---- Checkout: register stock exit from current cart (atomic) ----
-async function registerStockExit(){
+function getCartGrossTotal(){
+  const ids = Object.keys(selection);
+  return ids.reduce((sum, id) => {
+    const p = products.find(pr => pr.id === id);
+    return sum + (p ? p.price * selection[id] : 0);
+  }, 0);
+}
+
+function openCheckoutConfirm(){
   const ids = Object.keys(selection);
   if(ids.length === 0) return;
 
@@ -2362,6 +2966,90 @@ async function registerStockExit(){
     }
   }
 
+  document.getElementById('checkoutDiscountInput').value = '';
+  document.getElementById('discountErr').style.display = 'none';
+  updateCheckoutPreview();
+  document.getElementById('checkoutConfirmOverlay').classList.add('open');
+  setTimeout(()=>{ document.getElementById('checkoutDiscountInput').focus(); }, 60);
+}
+
+function closeCheckoutConfirm(){
+  document.getElementById('checkoutConfirmOverlay').classList.remove('open');
+}
+
+function getCheckoutDiscount(gross){
+  const raw = normalizePersianDigits(document.getElementById('checkoutDiscountInput').value.trim());
+  let discount = raw === '' ? 0 : parseFloat(raw);
+  let invalid = false;
+  if(isNaN(discount) || discount < 0){ discount = 0; invalid = raw !== ''; }
+  if(discount > gross){ discount = gross; invalid = true; }
+  return { discount, invalid };
+}
+
+function updateCheckoutPreview(){
+  const gross = getCartGrossTotal();
+  document.getElementById('checkoutGrossDisplay').textContent = toFa(gross) + ' تومان';
+  const { discount, invalid } = getCheckoutDiscount(gross);
+  document.getElementById('discountErr').style.display = invalid ? 'block' : 'none';
+  const net = Math.max(0, gross - discount);
+  document.getElementById('checkoutNetDisplay').textContent = toFa(net) + ' تومان';
+}
+
+async function confirmCheckout(){
+  const ids = Object.keys(selection);
+  if(ids.length === 0) return;
+
+  // Re-validate stock right before committing (in case something changed
+  // while the confirm dialog was open).
+  for(const id of ids){
+    const p = products.find(pr => pr.id === id);
+    if(!p) continue;
+    const need = selection[id];
+    const have = getStock(p);
+    if(need > have){
+      showToast(`موجودی کافی نیست: ${p.name} (موجودی فعلی: ${toFa(have)} عدد)`);
+      closeCheckoutConfirm();
+      renderGrid();
+      return;
+    }
+  }
+
+  const gross = getCartGrossTotal();
+  const { discount } = getCheckoutDiscount(gross);
+  const net = Math.max(0, gross - discount);
+  // Discount is allocated across items proportionally to each item's share
+  // of the gross total, so per-item profit reflects the actual discount.
+  const discountRatio = gross > 0 ? (discount / gross) : 0;
+
+  let hasUnknownCost = false;
+  let costOfGoods = 0;
+
+  const txnItems = ids.map(id => {
+    const p = products.find(pr => pr.id === id);
+    const qty = selection[id];
+    const unitPrice = p ? p.price : 0;
+    const subtotal = unitPrice * qty;
+    const itemDiscount = subtotal * discountRatio;
+    const costPrice = (p && p.costPrice !== undefined && p.costPrice !== null) ? p.costPrice : null;
+    let itemProfit = null;
+    if(costPrice !== null){
+      itemProfit = (subtotal - itemDiscount) - (costPrice * qty);
+      costOfGoods += costPrice * qty;
+    }else{
+      hasUnknownCost = true;
+    }
+    return {
+      productId: id,
+      name: p ? p.name : '',
+      qty,
+      unitPrice,
+      costPrice,
+      subtotal,
+      itemDiscount,
+      profit: itemProfit
+    };
+  });
+
   ids.forEach(id => {
     const p = products.find(pr => pr.id === id);
     if(!p) return;
@@ -2372,13 +3060,26 @@ async function registerStockExit(){
     pushHistory({productId: p.id, productName: p.name, type: 'out', delta: -qty, before, after});
   });
 
+  const profit = net - costOfGoods;
+
+  pushTransaction(txnItems, net, {
+    grossTotal: gross,
+    discount,
+    costOfGoods,
+    profit,
+    hasUnknownCost
+  });
+
   await persistProducts();
   await persistHistory();
+  await persistTransactions();
   selection = {};
   receiptOpen = false;
   document.getElementById('receiptDetails').classList.remove('open');
+  closeCheckoutConfirm();
   renderGrid();
   showToast('خروج از موجودی ثبت شد ✅');
+  speakTotal(net);
 }
 
 document.getElementById('stockModalOverlay').addEventListener('click', (e)=>{
@@ -2386,6 +3087,269 @@ document.getElementById('stockModalOverlay').addEventListener('click', (e)=>{
 });
 document.getElementById('historyOverlay').addEventListener('click', (e)=>{
   if(e.target.id === 'historyOverlay') closeHistoryModal();
+});
+document.getElementById('checkoutConfirmOverlay').addEventListener('click', (e)=>{
+  if(e.target.id === 'checkoutConfirmOverlay') closeCheckoutConfirm();
+});
+
+// ---- Barcode scanner ----
+let scannerActive = false;
+let scannerStream = null;
+let scannerZXingReader = null;
+let zxingLoadPromise = null;
+
+function loadZXing(){
+  if(window.ZXing) return Promise.resolve();
+  if(zxingLoadPromise) return zxingLoadPromise;
+  zxingLoadPromise = new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js';
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error('zxing load failed'));
+    document.head.appendChild(script);
+  });
+  return zxingLoadPromise;
+}
+
+function stopScannerStream(){
+  scannerActive = false;
+  if(scannerZXingReader){
+    try{ scannerZXingReader.reset(); }catch(e){}
+    scannerZXingReader = null;
+  }
+  if(scannerStream){
+    scannerStream.getTracks().forEach(tr => tr.stop());
+    scannerStream = null;
+  }
+  const video = document.getElementById('scannerVideo');
+  if(video) video.srcObject = null;
+}
+
+function closeScannerModal(){
+  stopScannerStream();
+  document.getElementById('scannerOverlay').classList.remove('open');
+}
+
+document.getElementById('scannerOverlay').addEventListener('click', (e)=>{
+  if(e.target.id === 'scannerOverlay') closeScannerModal();
+});
+
+async function openScanner(onResult){
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    showToast('دسترسی به دوربین روی این مرورگر/آدرس ممکن نیست (باید روی HTTPS باز باشه)');
+    return;
+  }
+
+  document.getElementById('scannerStatus').textContent = 'دوربین رو روی بارکد بگیر...';
+  document.getElementById('scannerOverlay').classList.add('open');
+
+  const video = document.getElementById('scannerVideo');
+  try{
+    scannerStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment' }
+    });
+  }catch(e){
+    showToast('اجازه دسترسی به دوربین داده نشد');
+    closeScannerModal();
+    return;
+  }
+  video.srcObject = scannerStream;
+  try{ await video.play(); }catch(e){}
+
+  const finish = (text) => {
+    if(!scannerActive) return;
+    stopScannerStream();
+    document.getElementById('scannerOverlay').classList.remove('open');
+    onResult(text);
+  };
+
+  if('BarcodeDetector' in window){
+    scannerActive = true;
+    let detector;
+    try{
+      detector = new BarcodeDetector({ formats: ['ean_13','ean_8','upc_a','upc_e','code_128','code_39','qr_code','itf'] });
+    }catch(e){
+      detector = new BarcodeDetector();
+    }
+    const scanLoop = async () => {
+      if(!scannerActive) return;
+      try{
+        const codes = await detector.detect(video);
+        if(codes && codes.length > 0){
+          finish(codes[0].rawValue);
+          return;
+        }
+      }catch(e){}
+      if(scannerActive) requestAnimationFrame(scanLoop);
+    };
+    requestAnimationFrame(scanLoop);
+  }else{
+    document.getElementById('scannerStatus').textContent = 'در حال آماده‌سازی اسکنر...';
+    try{
+      await loadZXing();
+    }catch(e){
+      showToast('بارگذاری ماژول اسکن ناموفق بود — اتصال اینترنت رو چک کن');
+      closeScannerModal();
+      return;
+    }
+    if(!scannerStream) return; // modal may have been closed while loading
+    document.getElementById('scannerStatus').textContent = 'دوربین رو روی بارکد بگیر...';
+    scannerActive = true;
+    scannerZXingReader = new ZXing.BrowserMultiFormatReader();
+    scannerZXingReader.decodeFromVideoElement(video, (result, err) => {
+      if(result && scannerActive){
+        finish(result.getText());
+      }
+    });
+  }
+}
+
+function scanForProductForm(){
+  openScanner((code) => {
+    document.getElementById('prodBarcode').value = code;
+    showToast('بارکد ثبت شد ✓');
+  });
+}
+
+function scanForSale(){
+  openScanner((code) => {
+    const p = products.find(pr => pr.barcode && pr.barcode === code);
+    if(!p){
+      showToast('محصولی با این بارکد پیدا نشد — می‌تونی محصول جدید بسازی');
+      openAddModal();
+      document.getElementById('prodBarcode').value = code;
+      return;
+    }
+    changeQty(p.id, 1);
+    lastUpdatedId = p.id;
+    renderGrid();
+    lastUpdatedId = null;
+    showToast(`${p.name} به سبد اضافه شد ✓`);
+  });
+}
+
+// ---- Bulk price change ----
+let bulkSelectedIds = new Set();
+let bulkMode = 'set';
+
+function openBulkPriceModal(){
+  bulkSelectedIds = new Set();
+  bulkMode = 'set';
+  document.getElementById('bulkSearchInput').value = '';
+  document.getElementById('bulkValueInput').value = '';
+  updateBulkModeButtons();
+  renderBulkProductList();
+  updateBulkSelectedCount();
+  document.getElementById('bulkPriceOverlay').classList.add('open');
+}
+
+function closeBulkPriceModal(){
+  document.getElementById('bulkPriceOverlay').classList.remove('open');
+}
+
+function getBulkFilteredProducts(){
+  const q = document.getElementById('bulkSearchInput').value.trim().toLowerCase();
+  return products.filter(p => p.name.toLowerCase().includes(q));
+}
+
+function renderBulkProductList(){
+  const filtered = getBulkFilteredProducts();
+  const listEl = document.getElementById('bulkList');
+  if(filtered.length === 0){
+    listEl.innerHTML = `<div class="sidebar-empty">محصولی پیدا نشد</div>`;
+  }else{
+    listEl.innerHTML = filtered.map(p => `
+      <label class="bulk-item-row">
+        <input type="checkbox" ${bulkSelectedIds.has(p.id) ? 'checked' : ''} onchange="toggleBulkItem('${p.id}', this.checked)">
+        <span class="bulk-item-name">${escapeHtml(p.name)}</span>
+        <span class="bulk-item-price">${toFa(p.price)} تومان</span>
+      </label>
+    `).join('');
+  }
+  syncBulkSelectAllCheckbox(filtered);
+}
+
+function toggleBulkItem(id, checked){
+  if(checked){ bulkSelectedIds.add(id); } else { bulkSelectedIds.delete(id); }
+  updateBulkSelectedCount();
+  syncBulkSelectAllCheckbox(getBulkFilteredProducts());
+}
+
+function syncBulkSelectAllCheckbox(filtered){
+  const allChecked = filtered.length > 0 && filtered.every(p => bulkSelectedIds.has(p.id));
+  document.getElementById('bulkSelectAll').checked = allChecked;
+}
+
+function toggleBulkSelectAll(){
+  const checked = document.getElementById('bulkSelectAll').checked;
+  const filtered = getBulkFilteredProducts();
+  filtered.forEach(p => {
+    if(checked){ bulkSelectedIds.add(p.id); } else { bulkSelectedIds.delete(p.id); }
+  });
+  renderBulkProductList();
+  updateBulkSelectedCount();
+}
+
+function updateBulkSelectedCount(){
+  document.getElementById('bulkSelectedCount').textContent = toFa(bulkSelectedIds.size) + ' محصول انتخاب شده';
+}
+
+function setBulkMode(mode){
+  bulkMode = mode;
+  updateBulkModeButtons();
+}
+
+function updateBulkModeButtons(){
+  document.getElementById('bulkModeSet').classList.toggle('active', bulkMode === 'set');
+  document.getElementById('bulkModeInc').classList.toggle('active', bulkMode === 'increase');
+  document.getElementById('bulkModeDec').classList.toggle('active', bulkMode === 'decrease');
+  const label = document.getElementById('bulkValueLabel');
+  if(bulkMode === 'set') label.textContent = 'قیمت جدید (تومان)';
+  else if(bulkMode === 'increase') label.textContent = 'مقدار افزایش (تومان)';
+  else label.textContent = 'مقدار کاهش (تومان)';
+}
+
+async function applyBulkPriceChange(){
+  if(bulkSelectedIds.size === 0){
+    showToast('حداقل یک محصول را انتخاب کن');
+    return;
+  }
+  const valStr = normalizePersianDigits(document.getElementById('bulkValueInput').value.trim());
+  const val = parseFloat(valStr);
+  if(valStr === '' || isNaN(val) || val < 0){
+    showToast('عدد معتبر وارد کن');
+    return;
+  }
+
+  const count = bulkSelectedIds.size;
+  let confirmMsg;
+  if(bulkMode === 'set'){
+    confirmMsg = `آیا مطمئن هستید قیمت ${toFa(count)} محصول به ${toFa(val)} تومان تغییر کند؟`;
+  }else if(bulkMode === 'increase'){
+    confirmMsg = `آیا مطمئن هستید قیمت ${toFa(count)} محصول به‌اندازه ${toFa(val)} تومان افزایش یابد؟`;
+  }else{
+    confirmMsg = `آیا مطمئن هستید قیمت ${toFa(count)} محصول به‌اندازه ${toFa(val)} تومان کاهش یابد؟`;
+  }
+  if(!confirm(confirmMsg)) return;
+
+  // Only the live product price changes here; every past transaction already
+  // stored its own price snapshot at sale time, so historical sales/profit
+  // figures are unaffected by this change.
+  products.forEach(p => {
+    if(!bulkSelectedIds.has(p.id)) return;
+    if(bulkMode === 'set') p.price = val;
+    else if(bulkMode === 'increase') p.price = p.price + val;
+    else p.price = Math.max(0, p.price - val);
+  });
+
+  await persistProducts();
+  renderGrid();
+  closeBulkPriceModal();
+  showToast(`قیمت ${toFa(count)} محصول به‌روزرسانی شد ✓`);
+}
+
+document.getElementById('bulkPriceOverlay').addEventListener('click', (e)=>{
+  if(e.target.id === 'bulkPriceOverlay') closeBulkPriceModal();
 });
 
 // ---- Backup / restore (for moving data between devices) ----
@@ -2402,7 +3366,8 @@ function exportBackup(){
     version: 1,
     exportedAt: new Date().toISOString(),
     products,
-    stockHistory
+    stockHistory,
+    transactions
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], {type: 'application/json'});
   const url = URL.createObjectURL(blob);
@@ -2432,12 +3397,14 @@ function importBackup(event){
         }
         products = data.products;
         stockHistory = Array.isArray(data.stockHistory) ? data.stockHistory : [];
+        transactions = Array.isArray(data.transactions) ? data.transactions : [];
         selection = {};
         activeCategory = 'همه';
         bannerDismissedForSession = false;
         stockBannerDismissedForSession = false;
         await persistProducts();
         await persistHistory();
+        await persistTransactions();
         renderGrid();
         closeBackupModal();
         showToast(`بازیابی انجام شد — ${toFa(products.length)} محصول بارگذاری شد ✓`);
@@ -2449,7 +3416,7 @@ function importBackup(event){
   };
 
   if(products.length > 0){
-    if(confirm('این عملیات تمام اطلاعات فعلی همین دستگاه (محصولات و تاریخچه موجودی) رو با محتوای فایل پشتیبان جایگزین می‌کند. ادامه می‌دهید؟')){
+    if(confirm('این عملیات تمام اطلاعات فعلی همین دستگاه (محصولات، تاریخچه موجودی و تراکنش‌ها) رو با محتوای فایل پشتیبان جایگزین می‌کند. ادامه می‌دهید؟')){
       doImport();
     }
   }else{
@@ -2478,6 +3445,8 @@ document.getElementById('catPills').addEventListener('wheel', function(e){
 
 loadProducts();
 loadStockHistory();
+loadTransactions();
+loadVoiceSetting();
 </script>
 
 </body>
