@@ -2684,7 +2684,7 @@ function handleImageUpload(event){
 async function saveProduct(keepOpen){
   const name = document.getElementById('prodName').value.trim();
   const category = document.getElementById('prodCategory').value.trim();
-  const barcode = document.getElementById('prodBarcode').value.trim();
+  const barcode = normalizeBarcode(document.getElementById('prodBarcode').value);
   const priceStr = document.getElementById('prodPrice').value;
   const price = parseFloat(priceStr);
   const costPriceStr = document.getElementById('prodCostPrice').value.trim();
@@ -2717,7 +2717,7 @@ async function saveProduct(keepOpen){
 
   // Prevent duplicate barcodes (except for the product being edited)
   if(barcode){
-    const dup = products.find(pr => pr.barcode === barcode && pr.id !== editingId);
+    const dup = products.find(pr => pr.barcode && barcodesMatch(pr.barcode, barcode) && pr.id !== editingId);
     if(dup){
       showToast('این بارکد قبلاً برای «' + dup.name + '» ثبت شده');
       return;
@@ -3648,10 +3648,40 @@ async function startHtml5Scanner(){
   document.getElementById('scannerHint').textContent = 'بارکد را صاف داخل کادر بگیر';
 }
 
+function normalizeBarcode(code){
+  if(code === null || code === undefined) return '';
+  let s = String(code).trim();
+  // Persian / Arabic digits → English
+  const fa = '۰۱۲۳۴۵۶۷۸۹';
+  const ar = '٠١٢٣٤٥٦٧٨٩';
+  s = s.replace(/[۰-۹]/g, d => String(fa.indexOf(d)));
+  s = s.replace(/[٠-٩]/g, d => String(ar.indexOf(d)));
+  // remove spaces and invisible chars
+  s = s.replace(/[\s\u200e\u200f\u202a-\u202e]/g, '');
+  return s;
+}
+
+function barcodesMatch(a, b){
+  a = normalizeBarcode(a);
+  b = normalizeBarcode(b);
+  if(!a || !b) return false;
+  if(a === b) return true;
+  // UPC-A (12) vs EAN-13 (13 with leading 0)
+  if(a.length === 12 && b.length === 13 && b === '0' + a) return true;
+  if(b.length === 12 && a.length === 13 && a === '0' + b) return true;
+  return false;
+}
+
+function findProductByBarcode(code){
+  const needle = normalizeBarcode(code);
+  if(!needle) return null;
+  return products.find(p => p.barcode && barcodesMatch(p.barcode, needle)) || null;
+}
+
 function onBarcodeScanned(decodedText){
   if(scannerHandling) return;
   scannerHandling = true;
-  const code = String(decodedText).trim();
+  const code = normalizeBarcode(decodedText);
   if(!code){ scannerHandling = false; return; }
 
   if(navigator.vibrate) try{ navigator.vibrate(80); }catch(e){}
@@ -3663,14 +3693,16 @@ function onBarcodeScanned(decodedText){
     return;
   }
 
-  const found = products.find(p => p.barcode && String(p.barcode) === code);
+  // Sale / cart mode: add qty if product exists
+  const found = findProductByBarcode(code);
   if(found){
     changeQty(found.id, 1);
     closeBarcodeScanner();
     showToast(found.name + ' اضافه شد ✓');
   }else{
     closeBarcodeScanner();
-    showToast('محصولی با این بارکد پیدا نشد — ' + code);
+    showToast('بارکد در لیست نیست: ' + code);
+    // Only open add form — user can cancel if they don't want a new product
     openAddModal();
     setTimeout(()=>{
       document.getElementById('prodBarcode').value = code;
