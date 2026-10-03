@@ -3156,6 +3156,8 @@ async function openScanner(onResult){
   video.srcObject = scannerStream;
   try{ await video.play(); }catch(e){}
 
+  scannerActive = true;
+
   const finish = (text) => {
     if(!scannerActive) return;
     stopScannerStream();
@@ -3163,28 +3165,14 @@ async function openScanner(onResult){
     onResult(text);
   };
 
-  if('BarcodeDetector' in window){
-    scannerActive = true;
-    let detector;
-    try{
-      detector = new BarcodeDetector({ formats: ['ean_13','ean_8','upc_a','upc_e','code_128','code_39','qr_code','itf'] });
-    }catch(e){
-      detector = new BarcodeDetector();
-    }
-    const scanLoop = async () => {
-      if(!scannerActive) return;
-      try{
-        const codes = await detector.detect(video);
-        if(codes && codes.length > 0){
-          finish(codes[0].rawValue);
-          return;
-        }
-      }catch(e){}
-      if(scannerActive) requestAnimationFrame(scanLoop);
-    };
-    requestAnimationFrame(scanLoop);
-  }else{
-    document.getElementById('scannerStatus').textContent = 'در حال آماده‌سازی اسکنر...';
+  // Some Android browsers report BarcodeDetector as available but the
+  // underlying on-device engine never actually fires (missing/outdated
+  // ML Kit module) — it just silently finds nothing forever. So if native
+  // detection hasn't found anything within a few seconds, we switch to
+  // the JS-based ZXing decoder on the SAME camera stream as a fallback.
+  const startZXingFallback = async () => {
+    if(!scannerActive) return;
+    document.getElementById('scannerStatus').textContent = 'در حال تلاش با روش جایگزین...';
     try{
       await loadZXing();
     }catch(e){
@@ -3192,15 +3180,55 @@ async function openScanner(onResult){
       closeScannerModal();
       return;
     }
-    if(!scannerStream) return; // modal may have been closed while loading
-    document.getElementById('scannerStatus').textContent = 'دوربین رو روی بارکد بگیر...';
-    scannerActive = true;
+    if(!scannerActive || !scannerStream) return;
     scannerZXingReader = new ZXing.BrowserMultiFormatReader();
     scannerZXingReader.decodeFromVideoElement(video, (result, err) => {
       if(result && scannerActive){
         finish(result.getText());
       }
     });
+  };
+
+  if('BarcodeDetector' in window){
+    let detector = null;
+    try{
+      detector = new BarcodeDetector({ formats: ['ean_13','ean_8','upc_a','upc_e','code_128','code_39','codabar','itf','qr_code'] });
+    }catch(e){
+      try{ detector = new BarcodeDetector(); }catch(e2){ detector = null; }
+    }
+
+    if(!detector){
+      startZXingFallback();
+      return;
+    }
+
+    let usingNative = true;
+    const nativeStartTime = Date.now();
+    const NATIVE_TIMEOUT_MS = 3500;
+
+    const scanLoop = async () => {
+      if(!scannerActive || !usingNative) return;
+      try{
+        const codes = await detector.detect(video);
+        if(codes && codes.length > 0){
+          finish(codes[0].rawValue);
+          return;
+        }
+      }catch(e){
+        usingNative = false;
+        startZXingFallback();
+        return;
+      }
+      if(Date.now() - nativeStartTime > NATIVE_TIMEOUT_MS){
+        usingNative = false;
+        startZXingFallback();
+        return;
+      }
+      if(scannerActive && usingNative) requestAnimationFrame(scanLoop);
+    };
+    requestAnimationFrame(scanLoop);
+  }else{
+    startZXingFallback();
   }
 }
 
