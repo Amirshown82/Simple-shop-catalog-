@@ -1149,7 +1149,11 @@
 
   /* ---- Barcode scanner ---- */
   .scanner-overlay{
-    position:fixed; inset:0;
+    position:fixed;
+    top:0; left:0; right:0; bottom:0;
+    width:100%;
+    height:100%;
+    height:100dvh;
     background:#000;
     z-index:100;
     display:none;
@@ -1161,9 +1165,11 @@
     align-items:center;
     justify-content:space-between;
     padding:14px 16px;
+    padding-top:max(14px, env(safe-area-inset-top));
     background:rgba(0,0,0,0.85);
     color:#fff;
     flex-shrink:0;
+    z-index:2;
   }
   .scanner-header h3{margin:0; font-size:16px; font-weight:700;}
   .scanner-close{
@@ -1177,21 +1183,49 @@
     display:flex;align-items:center;justify-content:center;
   }
   #scannerReader{
-    flex:1;
+    position:absolute;
+    inset:0;
     width:100%;
+    height:100%;
     overflow:hidden;
-    position:relative;
+    background:#111;
   }
   #scannerReader video{
+    width:100% !important;
+    height:100% !important;
     object-fit:cover !important;
+    border:none !important;
+  }
+  #scannerReader img{
+    object-fit:cover !important;
+  }
+  #scannerReader > div{
+    border:none !important;
   }
   .scanner-hint{
     padding:12px 16px;
+    padding-bottom:max(12px, env(safe-area-inset-bottom));
     background:rgba(0,0,0,0.85);
     color:#ccc;
     font-size:13px;
     text-align:center;
     flex-shrink:0;
+    z-index:2;
+  }
+  .scanner-status{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#aaa;
+    font-size:14px;
+    z-index:3;
+    pointer-events:none;
+    text-align:center;
+    padding:20px;
+    white-space:pre-line;
+    background:transparent;
   }
   .barcode-field-row{
     display:flex;
@@ -1383,8 +1417,11 @@
     <h3>اسکن بارکد</h3>
     <button class="scanner-close" onclick="closeBarcodeScanner()">×</button>
   </div>
-  <div id="scannerReader"></div>
-  <div class="scanner-hint">بارکد را داخل کادر قرار دهید</div>
+  <div style="flex:1; min-height:0; position:relative; width:100%;">
+    <div id="scannerReader"></div>
+    <div class="scanner-status" id="scannerStatus">در حال باز کردن دوربین...</div>
+  </div>
+  <div class="scanner-hint">بارکد را افقی داخل کادر قرار دهید</div>
 </div>
 
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
@@ -3342,6 +3379,12 @@ document.getElementById('catPills').addEventListener('wheel', function(e){
 let html5QrCode = null;
 let scannerTarget = 'cart'; // 'cart' | 'form'
 let scannerHandling = false;
+let scannerStarting = false;
+
+function setScannerStatus(msg){
+  const el = document.getElementById('scannerStatus');
+  if(el) el.textContent = msg || '';
+}
 
 function openBarcodeScanner(target){
   scannerTarget = target || 'cart';
@@ -3352,16 +3395,43 @@ function openBarcodeScanner(target){
     return;
   }
 
-  // Must be HTTPS (or localhost) for camera access
   if(location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1'){
     showToast('برای اسکن بارکد باید سایت با HTTPS باز شود');
     return;
   }
 
-  document.getElementById('scannerOverlay').classList.add('open');
+  if(scannerStarting) return;
+  scannerStarting = true;
 
-  // Only the formats shops actually use — fewer formats = faster decode
-  if(!html5QrCode){
+  document.getElementById('scannerOverlay').classList.add('open');
+  setScannerStatus('در حال باز کردن دوربین...');
+
+  // Wait until overlay is laid out so the camera container has real size
+  setTimeout(() => startScannerCamera(), 250);
+}
+
+async function startScannerCamera(){
+  try{
+    // Always recreate instance on a clean container — avoids black screen
+    // from leftover DOM nodes after previous stop/clear cycles.
+    if(html5QrCode){
+      try{
+        const st = html5QrCode.getState && html5QrCode.getState();
+        if(st === 2 || st === 3) await html5QrCode.stop();
+      }catch(e){}
+      try{ html5QrCode.clear(); }catch(e){}
+      html5QrCode = null;
+    }
+
+    const reader = document.getElementById('scannerReader');
+    reader.innerHTML = '';
+
+    const statusEl = document.getElementById('scannerStatus');
+    if(statusEl){
+      statusEl.style.display = 'flex';
+      statusEl.textContent = 'در حال باز کردن دوربین...';
+    }
+
     const formats = [
       Html5QrcodeSupportedFormats.EAN_13,
       Html5QrcodeSupportedFormats.EAN_8,
@@ -3374,47 +3444,35 @@ function openBarcodeScanner(target){
       formatsToSupport: formats,
       verbose: false
     });
-  }
 
-  // Wide rectangular box is critical for 1D barcodes (EAN/UPC).
-  // Square boxes are the main reason many web scanners feel "blind".
-  const config = {
-    fps: 15,
-    qrbox: function(viewfinderWidth, viewfinderHeight){
-      const w = Math.floor(viewfinderWidth * 0.88);
-      const h = Math.floor(Math.min(viewfinderHeight * 0.28, w * 0.35));
-      return { width: w, height: Math.max(h, 80) };
-    },
-    aspectRatio: 1.777,
-    disableFlip: false
-  };
+    // Wide box for 1D barcodes
+    const config = {
+      fps: 12,
+      qrbox: function(viewfinderWidth, viewfinderHeight){
+        const w = Math.floor(viewfinderWidth * 0.86);
+        const h = Math.floor(Math.min(viewfinderHeight * 0.30, w * 0.38));
+        return { width: Math.max(w, 200), height: Math.max(h, 90) };
+      }
+    };
 
-  // Prefer back camera + decent resolution for sharper barcode lines
-  const cameraConfig = {
-    facingMode: 'environment',
-    width: { ideal: 1280 },
-    height: { ideal: 720 }
-  };
-
-  html5QrCode.start(
-    cameraConfig,
-    config,
-    onBarcodeScanned,
-    () => {} // ignore continuous "not found" noise
-  ).catch(err => {
-    // Fallback: simpler constraint if high-res request fails on some devices
-    console.warn('Scanner start with constraints failed, retrying basic:', err);
-    html5QrCode.start(
+    // Simplest rear-camera constraint — most reliable on Android Chrome
+    await html5QrCode.start(
       { facingMode: 'environment' },
       config,
       onBarcodeScanned,
       () => {}
-    ).catch(err2 => {
-      console.error('Scanner start error:', err2);
-      showToast('دسترسی به دوربین ممکن نیست. اجازه دوربین را در تنظیمات مرورگر فعال کن');
-      closeBarcodeScanner();
-    });
-  });
+    );
+
+    if(statusEl) statusEl.style.display = 'none';
+
+  }catch(err){
+    console.error('Scanner start error:', err);
+    const msg = (err && err.message) ? String(err.message) : String(err);
+    setScannerStatus('دوربین باز نشد.\nاجازه دوربین را در تنظیمات مرورگر فعال کن.\n\n' + msg);
+    showToast('دسترسی به دوربین ممکن نیست');
+  }finally{
+    scannerStarting = false;
+  }
 }
 
 function onBarcodeScanned(decodedText){
@@ -3427,7 +3485,6 @@ function onBarcodeScanned(decodedText){
     return;
   }
 
-  // Vibrate if supported
   if(navigator.vibrate) try{ navigator.vibrate(80); }catch(e){}
 
   if(scannerTarget === 'form'){
@@ -3437,7 +3494,6 @@ function onBarcodeScanned(decodedText){
     return;
   }
 
-  // Cart mode: find product and add 1 to selection
   const found = products.find(p => p.barcode && String(p.barcode) === code);
   if(found){
     changeQty(found.id, 1);
@@ -3446,7 +3502,6 @@ function onBarcodeScanned(decodedText){
   }else{
     closeBarcodeScanner();
     showToast('محصولی با این بارکد پیدا نشد');
-    // Open add modal with barcode pre-filled
     openAddModal();
     setTimeout(()=>{
       document.getElementById('prodBarcode').value = code;
@@ -3457,19 +3512,27 @@ function onBarcodeScanned(decodedText){
 
 async function closeBarcodeScanner(){
   document.getElementById('scannerOverlay').classList.remove('open');
+  scannerStarting = false;
+  scannerHandling = false;
+
   if(html5QrCode){
     try{
       const state = html5QrCode.getState && html5QrCode.getState();
-      // 2 = SCANNING, 3 = PAUSED
       if(state === 2 || state === 3){
         await html5QrCode.stop();
       }
-    }catch(e){
-      // already stopped
-    }
+    }catch(e){}
     try{ html5QrCode.clear(); }catch(e){}
+    html5QrCode = null;
   }
-  scannerHandling = false;
+
+  const reader = document.getElementById('scannerReader');
+  if(reader) reader.innerHTML = '';
+  const statusEl = document.getElementById('scannerStatus');
+  if(statusEl){
+    statusEl.style.display = 'flex';
+    statusEl.textContent = 'در حال باز کردن دوربین...';
+  }
 }
 
 loadProducts();
