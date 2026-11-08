@@ -166,6 +166,27 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:12p
 .bulk-mode-btn{flex:1;padding:9px;border-radius:9px;border:1px solid var(--line);background:var(--bg);font-size:12.5px;font-weight:600;color:var(--ink-soft);cursor:pointer}
 .bulk-mode-btn.active{background:var(--ink);color:#fff;border-color:var(--ink)}
 
+/* voice */
+.mic-btn{width:34px;height:34px;flex-shrink:0;border-radius:8px;border:none;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.mic-btn.listening,.voice-big-mic.listening,.mic-fill-btn.listening{background:var(--danger);color:#fff;animation:pulse 1.1s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(193,68,58,.5)}70%{box-shadow:0 0 0 12px rgba(193,68,58,0)}100%{box-shadow:0 0 0 0 rgba(193,68,58,0)}}
+.voice-fill-row{margin-bottom:14px}
+.mic-fill-btn{width:100%;padding:10px;border-radius:9px;border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:600;font-size:13.5px;cursor:pointer}
+.voice-hint{font-size:11.5px;color:var(--ink-soft);margin-top:6px;line-height:1.7}
+.voice-big-mic{display:flex;margin:6px auto 10px;width:76px;height:76px;border-radius:50%;border:none;background:var(--ink);color:#fff;align-items:center;justify-content:center;cursor:pointer}
+.voice-status{text-align:center;font-size:12.5px;color:var(--ink-soft);margin-bottom:8px}
+.voice-transcript{text-align:center;min-height:22px;font-size:15px;font-weight:600;margin-bottom:8px;word-break:break-word}
+.voice-result{min-height:20px;border-radius:10px;font-size:13.5px;line-height:1.7;text-align:center}
+.voice-result.ok,.voice-result.warn{padding:10px 12px;margin-bottom:8px}
+.voice-result.ok{background:var(--ok-soft);color:var(--ok)}
+.voice-result.warn{background:var(--warn-soft);color:var(--warn)}
+.voice-cands-title{font-size:12px;color:var(--ink-soft);margin:4px 0 6px}
+.voice-cand{display:flex;justify-content:space-between;width:100%;text-align:right;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:10px 12px;margin-bottom:6px;font-size:13.5px;cursor:pointer}
+.voice-cand span{font-family:var(--mono);color:var(--ink-soft)}
+.voice-cont{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-soft);margin:10px 0}
+.voice-help{font-size:12.5px;color:var(--ink-soft);margin-bottom:4px}
+.voice-help summary{cursor:pointer;font-weight:600;color:var(--accent)}
+.voice-help ul{padding-right:18px;margin:8px 0;line-height:1.9}
 .toast{position:fixed;bottom:130px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:80;max-width:90vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
@@ -193,6 +214,9 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:12p
       <span class="tag" id="itemCountTag">0 کالا</span>
     </div>
     <div class="actions">
+      <button class="icon-btn" onclick="voiceOpenPanel()" title="دستیار صوتی">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg>
+      </button>
       <button class="icon-btn" onclick="openBackupModal()" title="پشتیبان‌گیری و انتقال">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       </button>
@@ -212,6 +236,7 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:12p
   <div class="search-bar">
     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
     <input type="text" id="searchInput" placeholder="جستجوی محصول..." oninput="renderGrid()">
+    <button class="mic-btn" id="searchMicBtn" onclick="voiceSearchMic()" title="جستجو با صدا"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg></button>
   </div>
 
   <div class="cat-pills" id="catPills"></div>
@@ -246,6 +271,10 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:12p
 <div class="overlay" id="modalOverlay">
   <div class="modal">
     <h2 id="modalTitle">افزودن محصول</h2>
+    <div class="voice-fill-row">
+      <button class="mic-fill-btn" id="formMicBtn" onclick="voiceFillForm()">🎤 پر کردن با صدا</button>
+      <div class="voice-hint" id="formVoiceText"></div>
+    </div>
     <div class="field">
       <label>تصویر (اختیاری)</label>
       <div class="img-upload">
@@ -422,6 +451,32 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:12p
   </div>
 </div>
 
+<!-- Voice assistant -->
+<div class="overlay" id="voiceOverlay">
+  <div class="modal">
+    <h2>🎤 دستیار صوتی</h2>
+    <button class="voice-big-mic" id="voiceBigMic" onclick="voiceToggleListening()"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg></button>
+    <div class="voice-status" id="voiceStatus">آماده</div>
+    <div class="voice-transcript" id="voiceTranscript"></div>
+    <div class="voice-result" id="voiceResult"></div>
+    <div class="voice-cands" id="voiceCands"></div>
+    <label class="voice-cont"><input type="checkbox" id="voiceContinuous"> بعد از هر دستور خودکار دوباره گوش بده</label>
+    <details class="voice-help">
+      <summary>چه دستورهایی را می‌فهمم؟</summary>
+      <ul>
+        <li><b>افزودن محصول:</b> «محصول جدید شیر پگاه، قیمت پنجاه هزار، قیمت خرید چهل هزار، موجودی بیست، دسته لبنیات»</li>
+        <li><b>سبد:</b> «دو تا شیر پگاه»، «سه تا نان به سبد اضافه کن»</li>
+        <li><b>جستجو:</b> «پیدا کن کوکا»، «جستجو شیر»</li>
+        <li><b>موجودی و قیمت:</b> «موجودی شیر چنده»، «قیمت کوکا»</li>
+        <li><b>ورود کالا:</b> «ورود بیست تا شیر پگاه»</li>
+        <li><b>سبد و فروش:</b> «جمع کل»، «ثبت فروش»، «سبد را پاک کن»</li>
+        <li><b>نمایش:</b> «کم‌موجود»، «در حال انقضا»، «همه»، «سود امروز»</li>
+      </ul>
+    </details>
+    <div class="modal-actions"><button class="btn-secondary" onclick="voiceClosePanel()">بستن</button></div>
+  </div>
+</div>
+
 <div class="card-menu" id="cardMenu">
   <button onclick="menuAction('edit')">ویرایش</button>
   <button onclick="menuAction('stock')">مدیریت موجودی</button>
@@ -431,6 +486,528 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:12p
 <div class="toast" id="toast"></div>
 
 <script>
+// ================= Voice assistant =================
+const VOICE_UNITS = {'صفر':0,'یک':1,'یه':1,'دو':2,'سه':3,'چهار':4,'پنج':5,'شش':6,'شیش':6,'هفت':7,'هشت':8,'نه':9,'ده':10,'یازده':11,'دوازده':12,'سیزده':13,'چهارده':14,'پانزده':15,'شانزده':16,'هفده':17,'هجده':18,'نوزده':19,'بیست':20,'سی':30,'چهل':40,'پنجاه':50,'شصت':60,'هفتاد':70,'هشتاد':80,'نود':90,'صد':100,'یکصد':100,'دویست':200,'سیصد':300,'چهارصد':400,'پانصد':500,'ششصد':600,'شیشصد':600,'هفتصد':700,'هشتصد':800,'نهصد':900};
+const VOICE_MULT = {'هزار':1e3,'میلیون':1e6,'میلیارد':1e9};
+const FORM_VOICE_HINT = 'مثال: «شیر پگاه، قیمت پنجاه هزار، قیمت خرید چهل هزار، موجودی بیست، دسته لبنیات»';
+
+let recog = null;
+let voicePanelOpen = false;
+let voicePendingCands = null;
+let voiceLastError = '';
+let voiceNoSpeech = 0;
+let searchMicActive = false;
+let formMicActive = false;
+
+function vnorm(s){
+  return normalizePersianDigits(String(s === undefined || s === null ? '' : s))
+    .replace(/\u064A/g, '\u06CC').replace(/\u0643/g, '\u06A9').replace(/\u0629/g, '\u0647')
+    .replace(/[\u200c\u200f\u200e]/g, ' ')
+    .replace(/(\d)[,\u060C\u066C](?=\d{3}(?!\d))/g, '$1')
+    .replace(/(\d)\.(?=\d)/g, '$1\u0001')
+    .replace(/[.,\u060C\u061F?!\u061B:;"\u00AB\u00BB()\-]/g, ' ')
+    .replace(/\u0001/g, '.')
+    .replace(/\s+/g, ' ').trim();
+}
+
+function isNumTok(t){
+  return /^\d+(\.\d+)?$/.test(t) || Object.prototype.hasOwnProperty.call(VOICE_UNITS, t) || Object.prototype.hasOwnProperty.call(VOICE_MULT, t) || t === 'نیم';
+}
+
+function parsePersianNumber(text){
+  const toks = vnorm(text).split(' ').filter(Boolean);
+  let total = 0, cur = 0, found = false;
+  for(const t of toks){
+    if(/^\d+(\.\d+)?$/.test(t)){ cur += parseFloat(t); found = true; continue; }
+    if(Object.prototype.hasOwnProperty.call(VOICE_UNITS, t)){
+      const v = VOICE_UNITS[t];
+      if(t === 'صد' && cur > 0 && cur < 10) cur *= 100; else cur += v;
+      found = true; continue;
+    }
+    if(t === 'نیم'){ cur += 0.5; found = true; continue; }
+    if(Object.prototype.hasOwnProperty.call(VOICE_MULT, t)){ total += (cur || 1) * VOICE_MULT[t]; cur = 0; found = true; continue; }
+  }
+  if(!found) return null;
+  return Math.round(total + cur);
+}
+
+const FORM_KEYS = [
+  ['قیمت خرید','cost'], ['قیمت فروش','price'], ['حداقل موجودی','min'], ['دسته بندی','category'],
+  ['موجودی','stock'], ['قیمت','price'], ['دسته','category'], ['حداقل','min'],
+  ['خرید','cost'], ['فروش','price'], ['تعداد','stock'], ['اسم','name'], ['نام','name']
+];
+
+function parseProductSpeech(text){
+  const s = vnorm(text);
+  const alt = FORM_KEYS.map(k => k[0].replace(' ', '\\s+')).join('|');
+  const re = new RegExp('(?:^|\\s)(' + alt + ')(?=\\s|$)', 'g');
+  const marks = [];
+  let m;
+  while((m = re.exec(s))){
+    const word = m[1].replace(/\s+/g, ' ');
+    const key = FORM_KEYS.find(k => k[0] === word)[1];
+    marks.push({key, start: m.index + (m[0].length - m[1].length), end: m.index + m[0].length});
+  }
+  const result = {};
+  let pre = s.slice(0, marks.length ? marks[0].start : s.length).trim();
+  for(let i = 0; i < 3; i++){
+    pre = pre.replace(/^(?:لطفا |یک |یه )?(?:محصول جدید|افزودن محصول|اضافه کردن محصول|ثبت محصول|محصول|افزودن|اضافه کن|ثبت)(?= |$)\s*/, '').trim();
+  }
+  marks.forEach((mk, i) => {
+    const seg = s.slice(mk.end, i + 1 < marks.length ? marks[i + 1].start : s.length).trim();
+    if(mk.key === 'name'){ if(seg) result.name = seg; return; }
+    if(mk.key === 'category'){ if(seg) result.category = seg; return; }
+    const n = parsePersianNumber(seg);
+    if(n === null) return;
+    if(mk.key === 'stock' || mk.key === 'min') result[mk.key] = Math.max(0, Math.floor(n));
+    else result[mk.key] = Math.max(0, n);
+  });
+  if(!result.name && pre) result.name = pre;
+  return result;
+}
+
+function fillFormFromSpeech(r){
+  const filled = [];
+  const set = (id, val, label) => { document.getElementById(id).value = String(val); filled.push(label); };
+  if(r.name) set('prodName', r.name, 'نام');
+  if(r.category) set('prodCategory', r.category, 'دسته');
+  if(r.price !== undefined) set('prodPrice', r.price, 'قیمت فروش');
+  if(r.cost !== undefined) set('prodCostPrice', r.cost, 'قیمت خرید');
+  if(r.stock !== undefined) set('prodStock', r.stock, 'موجودی');
+  if(r.min !== undefined) set('prodMinStock', r.min, 'حداقل موجودی');
+  return filled;
+}
+
+function vnormName(s){ return vnorm(s).replace(/[\u064B-\u065F]/g, '').toLowerCase(); }
+
+function levenshtein(a, b){
+  const m = a.length, n = b.length;
+  if(!m) return n; if(!n) return m;
+  let prev = Array.from({length: n + 1}, (_, j) => j);
+  for(let i = 1; i <= m; i++){
+    const cur = [i];
+    for(let j = 1; j <= n; j++){
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    }
+    prev = cur;
+  }
+  return prev[n];
+}
+
+function tokenSim(a, b){
+  if(a === b) return 1;
+  if(a.length >= 3 && b.length >= 3 && (a.includes(b) || b.includes(a))) return 0.85;
+  if(Math.min(a.length, b.length) >= 4){
+    const d = levenshtein(a, b);
+    if(d <= 1) return 0.8;
+    if(d <= 2 && Math.max(a.length, b.length) >= 7) return 0.65;
+  }
+  return 0;
+}
+
+function matchProducts(query){
+  const qt = vnormName(query).split(' ').filter(Boolean);
+  if(!qt.length) return [];
+  const out = [];
+  for(const p of products){
+    const nt = vnormName(p.name).split(' ').filter(Boolean);
+    if(!nt.length) continue;
+    let sum = 0;
+    const used = new Set();
+    for(const q of qt){
+      let best = 0, bi = -1;
+      nt.forEach((n, i) => { const s = tokenSim(q, n); if(s > best){ best = s; bi = i; } });
+      sum += best;
+      if(bi >= 0) used.add(bi);
+    }
+    const recall = sum / qt.length;
+    if(recall < 0.6) continue;
+    out.push({p, score: recall * 0.8 + (used.size / nt.length) * 0.2});
+  }
+  out.sort((a, b) => b.score - a.score);
+  return out;
+}
+
+function pickProduct(list){
+  if(!list.length) return null;
+  if(list.length === 1) return {p: list[0].p};
+  if(list[0].score - list[1].score >= 0.12) return {p: list[0].p};
+  return {ambiguous: list.slice(0, 5)};
+}
+
+function splitQtyAndName(str){
+  const FILL = ['تا', 'عدد', 'دونه', 'تای'];
+  const toks = vnorm(str).split(' ').filter(Boolean);
+  while(toks.length > 1 && FILL.includes(toks[toks.length - 1])) toks.pop();
+  let i = 0;
+  while(i < toks.length && (isNumTok(toks[i]) || (toks[i] === 'و' && i > 0 && i + 1 < toks.length && isNumTok(toks[i + 1])))) i++;
+  let qtyStr = '', nameToks;
+  if(i > 0){ qtyStr = toks.slice(0, i).join(' '); nameToks = toks.slice(i); }
+  else{
+    let j = toks.length;
+    while(j > 0 && isNumTok(toks[j - 1])) j--;
+    if(j < toks.length && j > 0){ qtyStr = toks.slice(j).join(' '); nameToks = toks.slice(0, j); }
+    else nameToks = toks;
+  }
+  let qty = qtyStr ? parsePersianNumber(qtyStr) : 1;
+  if(qty === null || qty < 1) qty = 1;
+  while(nameToks.length && FILL.includes(nameToks[0])) nameToks.shift();
+  return {qty: Math.floor(qty), name: nameToks.join(' ').trim()};
+}
+
+function interpretVoice(text){
+  const s = vnorm(text);
+  let m;
+  if((m = s.match(/^(?:لطفا )?(?:یک |یه )?(?:محصول جدید|افزودن محصول|اضافه کردن محصول|ثبت محصول|محصول اضافه کن)(?: (.*))?$/)))
+    return {type: 'addProduct', rest: (m[1] || '').trim(), text: s};
+  if(/(?:^| )(?:ثبت فروش|ثبت خروج|حساب کن|تایید فروش|تأیید فروش|فروش رو ثبت کن)(?: |$)/.test(s)) return {type: 'checkout', text: s};
+  if(/(?:پاک|خالی)/.test(s) && /(?:سبد|انتخاب)/.test(s)) return {type: 'clearCart', text: s};
+  if(s.split(' ').length <= 4 && /(?:^| )(?:جمع کل|جمع سبد|جمع چنده|چقدر شد|مبلغ کل|جمع)(?: |$)/.test(s)) return {type: 'total', text: s};
+  if(/(?:سود|فروش) امروز|تراکنش/.test(s)) return {type: 'reports', text: s};
+  if(/(?:در حال انقضا|منقضی|نزدیک انقضا)/.test(s)) return {type: 'expiring', text: s};
+  if(/(?:کم موجود|کم موجودی|تموم شده|ته کشیده|نیاز به شارژ)/.test(s)) return {type: 'lowStock', text: s};
+  if(/^(?:همه|نمایش همه|همه محصولات|نمایش همه محصولات|برگرد)$/.test(s)) return {type: 'showAll', text: s};
+  if((m = s.match(/^(?:ثبت )?ورود (.+)$/)) || (m = s.match(/^(.+?) (?:وارد شد|ورود شد|اومد|آمد|رسید)$/))){
+    const q = splitQtyAndName(m[1]);
+    return {type: 'stockIn', qty: q.qty, query: q.name, text: s};
+  }
+  if((m = s.match(/^موجودی (.+?)(?: (?:چنده|چقدره|چقدر|چند تاست|چند تا))?$/)) || (m = s.match(/^(.+?) (?:چند تا مونده|چندتا مونده|چند تا موجوده|چند تا هست|چقدر مونده|چقدر موجوده)$/)))
+    return {type: 'stockQuery', query: m[1].trim(), text: s};
+  if((m = s.match(/^قیمت (.+?)(?: (?:چنده|چقدره|چقدر|چند))?$/)) || (m = s.match(/^(.+?) (?:چنده|چقدره|چند تومنه|چند تومانه|چند تومان)$/)))
+    return {type: 'priceQuery', query: m[1].trim(), text: s};
+  if((m = s.match(/^(?:پیدا کن|جستجو|جستجوی|بگرد|نشون بده|نشان بده|سرچ|پیدا کنم) (.+)$/)) || (m = s.match(/^(.+?) (?:رو |را )?(?:پیدا کن|پیدا کنم|بگرد|نشون بده|نشان بده)$/)))
+    return {type: 'search', query: m[1].trim(), text: s};
+  const firstTok = s.split(' ')[0];
+  const hasCartWord = /(?:^| )(?:به سبد|تو سبد|توی سبد|سبد|اضافه کن|اضافه|بذار|بزار|بزن|بده)(?: |$)/.test(s);
+  if(hasCartWord || (isNumTok(firstTok) && s.split(' ').length > 1)){
+    const cleaned = s.replace(/(?:^| )(?:لطفا|به سبد|تو سبد|توی سبد|سبد|اضافه کن|اضافه کردن|اضافه|بذار|بزار|بزن|بده|رو|را|ازش|دونه|عدد|تا|هم|یکی)(?= |$)/g, ' ').replace(/\s+/g, ' ').trim();
+    const q = splitQtyAndName(cleaned);
+    if(q.name) return {type: 'cart', qty: q.qty, query: q.name, text: s};
+  }
+  return {type: 'fallback', query: s, text: s};
+}
+
+const VOICE_PRODUCT_TYPES = ['cart', 'stockQuery', 'priceQuery', 'stockIn'];
+
+function voiceResolve(alts){
+  let firstUnresolved = null, fallback = null;
+  for(const t of alts){
+    const a = interpretVoice(t);
+    if(a.type === 'fallback'){ if(!fallback) fallback = a; continue; }
+    if(VOICE_PRODUCT_TYPES.includes(a.type)){
+      const list = matchProducts(a.query);
+      if(list.length) return {action: a, list};
+      if(!firstUnresolved) firstUnresolved = a;
+      continue;
+    }
+    return {action: a, list: []};
+  }
+  if(firstUnresolved) return {action: firstUnresolved, list: []};
+  return {action: fallback || {type: 'fallback', query: '', text: ''}, list: []};
+}
+
+function voiceErrorText(code){
+  switch(code){
+    case 'unsupported': return 'این مرورگر از تشخیص گفتار پشتیبانی نمی‌کند. مرورگر Chrome را امتحان کن.';
+    case 'not-allowed':
+    case 'service-not-allowed': return 'اجازه‌ی میکروفون داده نشد. برای این سایت میکروفون را مجاز کن (روی فایل محلی کار نمی‌کند؛ از لینک https سایت باز کن).';
+    case 'no-speech': return 'صدایی شنیده نشد. دوباره امتحان کن.';
+    case 'audio-capture': return 'میکروفون پیدا نشد.';
+    case 'network': return 'اتصال اینترنت لازم است (تشخیص گفتار آنلاین انجام می‌شود).';
+    case 'language-not-supported': return 'زبان فارسی روی این دستگاه پشتیبانی نمی‌شود.';
+    case 'start-failed': return 'شروع گوش دادن ممکن نشد. چند لحظه بعد دوباره امتحان کن.';
+    case 'aborted': return '';
+    default: return 'خطا: ' + code;
+  }
+}
+
+function voiceListen(opts){
+  const Ctor = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!Ctor){
+    if(opts.onError) opts.onError('unsupported');
+    if(opts.onEnd) opts.onEnd(false);
+    return null;
+  }
+  voiceStop();
+  const r = new Ctor();
+  r.lang = 'fa-IR';
+  r.interimResults = true;
+  r.maxAlternatives = 3;
+  r.continuous = false;
+  let gotFinal = false;
+  r.onresult = e => {
+    let interim = '';
+    for(let i = e.resultIndex; i < e.results.length; i++){
+      const res = e.results[i];
+      if(res.isFinal){
+        gotFinal = true;
+        const alts = [];
+        for(let k = 0; k < res.length; k++) alts.push(res[k].transcript);
+        if(opts.onFinal) opts.onFinal(alts);
+      }else{
+        interim += res[0].transcript;
+      }
+    }
+    if(interim && opts.onInterim) opts.onInterim(interim);
+  };
+  r.onerror = e => { if(opts.onError) opts.onError((e && e.error) || 'unknown'); };
+  r.onend = () => {
+    if(recog === r) recog = null;
+    if(opts.onEnd) opts.onEnd(gotFinal);
+  };
+  recog = r;
+  try{ r.start(); }
+  catch(err){
+    recog = null;
+    if(opts.onError) opts.onError('start-failed');
+    if(opts.onEnd) opts.onEnd(false);
+  }
+  return r;
+}
+
+function voiceStop(){
+  if(recog){
+    const r = recog;
+    recog = null;
+    try{ r.abort(); }catch(e){}
+  }
+}
+
+function cleanSearchText(t){
+  return vnorm(t)
+    .replace(/^(?:پیدا کن|جستجو|جستجوی|بگرد|نشون بده|نشان بده|سرچ) /, '')
+    .replace(/ (?:رو |را )?(?:پیدا کن|پیدا کنم|بگرد|نشون بده|نشان بده)$/, '')
+    .trim();
+}
+
+function voiceSearchMic(){
+  if(searchMicActive){ voiceStop(); return; }
+  const btn = document.getElementById('searchMicBtn');
+  const input = document.getElementById('searchInput');
+  searchMicActive = true;
+  btn.classList.add('listening');
+  showToast('🎤 حرف بزن… اسم محصول را بگو');
+  voiceListen({
+    onInterim: t => { input.value = cleanSearchText(t); renderGrid(); },
+    onFinal: alts => { input.value = cleanSearchText(alts[0]); renderGrid(); },
+    onError: c => { const m = voiceErrorText(c); if(m) showToast(m); },
+    onEnd: () => { searchMicActive = false; btn.classList.remove('listening'); }
+  });
+}
+
+function voiceFillForm(){
+  if(formMicActive){ voiceStop(); return; }
+  const btn = document.getElementById('formMicBtn');
+  const hint = document.getElementById('formVoiceText');
+  formMicActive = true;
+  btn.classList.add('listening');
+  btn.textContent = '🎤 در حال گوش دادن… (برای توقف لمس کن)';
+  voiceListen({
+    onInterim: t => { hint.textContent = '«' + t + '»'; },
+    onFinal: alts => {
+      let best = null, bestN = -1;
+      for(const t of alts){
+        const r = parseProductSpeech(t);
+        const n = Object.keys(r).length;
+        if(n > bestN){ best = r; bestN = n; }
+      }
+      const filled = fillFormFromSpeech(best || {});
+      hint.textContent = filled.length
+        ? 'پر شد: ' + filled.join('، ') + ' — بررسی کن و «ذخیره» را بزن'
+        : 'چیزی تشخیص داده نشد: «' + alts[0] + '»';
+    },
+    onError: c => { const m = voiceErrorText(c); if(m) hint.textContent = m; },
+    onEnd: () => {
+      formMicActive = false;
+      btn.classList.remove('listening');
+      btn.textContent = '🎤 پر کردن با صدا';
+    }
+  });
+}
+
+function voiceSay(msg, kind){
+  const el = document.getElementById('voiceResult');
+  el.textContent = msg;
+  el.className = 'voice-result ' + (kind || 'ok');
+}
+function voiceSetStatus(t){ document.getElementById('voiceStatus').textContent = t; }
+
+function voiceOpenPanel(){
+  voicePanelOpen = true;
+  document.getElementById('voiceTranscript').textContent = '';
+  document.getElementById('voiceResult').textContent = '';
+  document.getElementById('voiceResult').className = 'voice-result';
+  document.getElementById('voiceCands').innerHTML = '';
+  voicePendingCands = null;
+  document.getElementById('voiceOverlay').classList.add('open');
+  voiceNoSpeech = 0;
+  voiceStartListening();
+}
+
+function voiceClosePanel(){
+  voicePanelOpen = false;
+  voicePendingCands = null;
+  voiceStop();
+  document.getElementById('voiceBigMic').classList.remove('listening');
+  document.getElementById('voiceOverlay').classList.remove('open');
+}
+
+function voiceToggleListening(){
+  if(recog){ voiceStop(); return; }
+  voiceNoSpeech = 0;
+  voiceStartListening();
+}
+
+function voiceStartListening(){
+  if(!voicePanelOpen) return;
+  voicePendingCands = null;
+  voiceLastError = '';
+  document.getElementById('voiceCands').innerHTML = '';
+  document.getElementById('voiceBigMic').classList.add('listening');
+  voiceSetStatus('در حال گوش دادن… حرف بزن');
+  voiceListen({
+    onInterim: t => { document.getElementById('voiceTranscript').textContent = '«' + t + '»'; },
+    onFinal: alts => {
+      voiceNoSpeech = 0;
+      document.getElementById('voiceTranscript').textContent = '«' + alts[0] + '»';
+      voiceProcess(alts);
+    },
+    onError: c => {
+      voiceLastError = c;
+      if(c === 'no-speech') voiceNoSpeech++;
+      const m = voiceErrorText(c);
+      if(m) voiceSay(m, 'warn');
+    },
+    onEnd: () => {
+      document.getElementById('voiceBigMic').classList.remove('listening');
+      voiceSetStatus('آماده — برای دستور بعدی میکروفون را لمس کن');
+      const cont = document.getElementById('voiceContinuous').checked;
+      const okToRestart = !voiceLastError || (voiceLastError === 'no-speech' && voiceNoSpeech < 3);
+      if(voicePanelOpen && cont && okToRestart && !voicePendingCands) setTimeout(voiceStartListening, 500);
+    }
+  });
+}
+
+function voiceProcess(alts){
+  const r = voiceResolve(alts);
+  voiceExecute(r.action, r.list);
+}
+
+function voiceShowCandidates(list, onPick){
+  voicePendingCands = {list, onPick};
+  document.getElementById('voiceCands').innerHTML =
+    '<div class="voice-cands-title">منظورت کدام است؟</div>' +
+    list.map((c, i) => `<button class="voice-cand" onclick="voicePick(${i})">${escapeHtml(c.p.name)} <span>${toFa(c.p.price)}</span></button>`).join('');
+}
+
+function voicePick(i){
+  if(!voicePendingCands) return;
+  const {list, onPick} = voicePendingCands;
+  voicePendingCands = null;
+  document.getElementById('voiceCands').innerHTML = '';
+  onPick(list[i].p);
+}
+
+async function applyStockIn(p, qty){
+  const before = getStock(p);
+  const after = before + qty;
+  p.stock = after;
+  pushHistory({productId: p.id, productName: p.name, type: 'in', delta: qty, before, after});
+  await persistProducts();
+  await persistHistory();
+  renderGrid();
+  voiceSay(`✓ ورود ${toFa(qty)} عدد «${p.name}» ثبت شد — موجودی جدید: ${toFa(after)}`, 'ok');
+}
+
+function voiceExecute(a, list){
+  const withProduct = fn => {
+    if(!list.length){ voiceSay(`محصولی شبیه «${a.query}» پیدا نشد`, 'warn'); return; }
+    const pick = pickProduct(list);
+    if(pick.ambiguous){ voiceSay('چند محصول شبیه هم هست', 'warn'); voiceShowCandidates(pick.ambiguous, fn); return; }
+    fn(pick.p);
+  };
+  switch(a.type){
+    case 'addProduct': {
+      voiceClosePanel();
+      openAddModal();
+      const filled = fillFormFromSpeech(parseProductSpeech(a.rest));
+      document.getElementById('formVoiceText').textContent = filled.length
+        ? 'پر شد: ' + filled.join('، ') + ' — بررسی کن و «ذخیره» را بزن'
+        : FORM_VOICE_HINT;
+      showToast(filled.length ? 'فرم با صدا پر شد ✓ بررسی کن و ذخیره بزن' : 'فرم باز شد');
+      return;
+    }
+    case 'checkout':
+      if(!Object.keys(selection).length){ voiceSay('سبد خالی است', 'warn'); return; }
+      voiceClosePanel();
+      openCheckoutConfirm();
+      return;
+    case 'clearCart':
+      selection = {};
+      renderGrid();
+      voiceSay('✓ سبد خالی شد', 'ok');
+      return;
+    case 'total': {
+      const ids = Object.keys(selection);
+      const count = ids.reduce((s, id) => s + selection[id], 0);
+      voiceSay(ids.length ? `جمع سبد: ${toFa(getCartGrossTotal())} تومان (${toFa(count)} قلم)` : 'سبد خالی است', ids.length ? 'ok' : 'warn');
+      return;
+    }
+    case 'reports':
+      voiceClosePanel();
+      openTransactionsModal();
+      return;
+    case 'expiring':
+      if(getExpiringProducts().length){ setCategory(EXPIRING_KEY); voiceSay('✓ کالاهای نزدیک به انقضا نمایش داده شد', 'ok'); }
+      else voiceSay('هیچ کالایی نزدیک به انقضا نیست ✓', 'ok');
+      return;
+    case 'lowStock':
+      if(getLowStockProducts().length){ setCategory(LOWSTOCK_KEY); voiceSay('✓ کالاهای کم‌موجود نمایش داده شد', 'ok'); }
+      else voiceSay('هیچ کالای کم‌موجودی نیست ✓', 'ok');
+      return;
+    case 'showAll':
+      document.getElementById('searchInput').value = '';
+      setCategory('همه');
+      voiceSay('✓ همه‌ی محصولات نمایش داده شد', 'ok');
+      return;
+    case 'cart':
+      withProduct(p => {
+        changeQty(p.id, a.qty);
+        voiceSay(`✓ ${toFa(a.qty)} × «${p.name}» به سبد اضافه شد`, 'ok');
+      });
+      return;
+    case 'stockQuery':
+      withProduct(p => {
+        const min = getMinStock(p);
+        voiceSay(`«${p.name}»: موجودی ${toFa(getStock(p))} عدد` + (min > 0 ? ` (حداقل ${toFa(min)})` : ''), 'ok');
+      });
+      return;
+    case 'priceQuery':
+      withProduct(p => {
+        const cost = (p.costPrice !== undefined && p.costPrice !== null) ? ` — قیمت خرید ${toFa(p.costPrice)}` : '';
+        voiceSay(`«${p.name}»: قیمت فروش ${toFa(p.price)} تومان${cost}`, 'ok');
+      });
+      return;
+    case 'stockIn':
+      withProduct(p => {
+        if(confirm(`ورود ${a.qty} عدد «${p.name}» ثبت شود؟`)) applyStockIn(p, a.qty);
+        else voiceSay('لغو شد', 'warn');
+      });
+      return;
+    case 'search':
+    case 'fallback': {
+      const q = cleanSearchText(a.query || '');
+      if(!q){ voiceSay('متوجه نشدم. دوباره بگو یا راهنما را ببین.', 'warn'); return; }
+      document.getElementById('searchInput').value = q;
+      renderGrid();
+      const n = products.filter(p => String(p.name || '').toLowerCase().includes(q.toLowerCase())).length;
+      voiceSay(`جستجو: «${q}» — ${toFa(n)} مورد`, n ? 'ok' : 'warn');
+      return;
+    }
+  }
+}
+
+
 // ================= State =================
 let products = [];
 let selection = {};
@@ -598,6 +1175,7 @@ function openAddModal(keepCategory){
   refreshExpiryDependentFields();
   populateCategoryList();
   document.getElementById('imgPreview').innerHTML = NO_IMG_SVG;
+  document.getElementById('formVoiceText').textContent = FORM_VOICE_HINT;
   document.getElementById('deleteBtn').style.display = 'none';
   document.getElementById('saveAndNextBtn').style.display = 'block';
   document.getElementById('nameErr').style.display = 'none';
@@ -624,6 +1202,7 @@ function openEditModal(id, focusField){
   refreshExpiryDependentFields();
   populateCategoryList();
   document.getElementById('imgPreview').innerHTML = p.image ? `<img src="${p.image}">` : NO_IMG_SVG;
+  document.getElementById('formVoiceText').textContent = FORM_VOICE_HINT;
   document.getElementById('deleteBtn').style.display = 'block';
   document.getElementById('saveAndNextBtn').style.display = 'none';
   document.getElementById('nameErr').style.display = 'none';
@@ -731,7 +1310,8 @@ function menuAction(action){
   ['transactionsOverlay', closeTransactionsModal],
   ['checkoutConfirmOverlay', closeCheckoutConfirm],
   ['backupModalOverlay', closeBackupModal],
-  ['bulkPriceOverlay', closeBulkPriceModal]
+  ['bulkPriceOverlay', closeBulkPriceModal],
+  ['voiceOverlay', voiceClosePanel]
 ].forEach(([id, fn]) => {
   document.getElementById(id).addEventListener('click', e => { if(e.target.id === id) fn(); });
 });
@@ -1543,7 +2123,7 @@ function handleImageUpload(event){
   reader.readAsDataURL(file);
 }
 
-function closeModal(){
+function closeModal(){ voiceStop();
   document.getElementById('modalOverlay').classList.remove('open');
 }
 
