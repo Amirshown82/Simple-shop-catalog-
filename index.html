@@ -468,6 +468,7 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:12p
         <li><b>سبد:</b> «دو تا شیر پگاه»، «سه تا نان به سبد اضافه کن»</li>
         <li><b>جستجو:</b> «پیدا کن کوکا»، «جستجو شیر»</li>
         <li><b>موجودی و قیمت:</b> «موجودی شیر چنده»، «قیمت کوکا»</li>
+        <li><b>تاریخ انقضا:</b> «تاریخ انقضای شیر پگاه بیست مهر»، «... سه ماه دیگه»، «... ده روز دیگه»، «تاریخ انقضای شیر چنده»، «تاریخ انقضای شیر رو حذف کن»</li>
         <li><b>ورود کالا:</b> «ورود بیست تا شیر پگاه»</li>
         <li><b>سبد و فروش:</b> «جمع کل»، «ثبت فروش»، «سبد را پاک کن»</li>
         <li><b>نمایش:</b> «کم‌موجود»، «در حال انقضا»، «همه»، «سود امروز»</li>
@@ -489,7 +490,7 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:12p
 // ================= Voice assistant =================
 const VOICE_UNITS = {'صفر':0,'یک':1,'یه':1,'دو':2,'سه':3,'چهار':4,'پنج':5,'شش':6,'شیش':6,'هفت':7,'هشت':8,'نه':9,'ده':10,'یازده':11,'دوازده':12,'سیزده':13,'چهارده':14,'پانزده':15,'شانزده':16,'هفده':17,'هجده':18,'نوزده':19,'بیست':20,'سی':30,'چهل':40,'پنجاه':50,'شصت':60,'هفتاد':70,'هشتاد':80,'نود':90,'صد':100,'یکصد':100,'دویست':200,'سیصد':300,'چهارصد':400,'پانصد':500,'ششصد':600,'شیشصد':600,'هفتصد':700,'هشتصد':800,'نهصد':900};
 const VOICE_MULT = {'هزار':1e3,'میلیون':1e6,'میلیارد':1e9};
-const FORM_VOICE_HINT = 'مثال: «شیر پگاه، قیمت پنجاه هزار، قیمت خرید چهل هزار، موجودی بیست، دسته لبنیات»';
+const FORM_VOICE_HINT = 'مثال: «شیر پگاه، قیمت پنجاه هزار، موجودی بیست، دسته لبنیات، تاریخ انقضا پانزده شهریور»';
 
 let recog = null;
 let voicePanelOpen = false;
@@ -532,6 +533,7 @@ function parsePersianNumber(text){
 }
 
 const FORM_KEYS = [
+  ['تاریخ انقضا','expiry'], ['انقضا','expiry'],
   ['قیمت خرید','cost'], ['قیمت فروش','price'], ['حداقل موجودی','min'], ['دسته بندی','category'],
   ['موجودی','stock'], ['قیمت','price'], ['دسته','category'], ['حداقل','min'],
   ['خرید','cost'], ['فروش','price'], ['تعداد','stock'], ['اسم','name'], ['نام','name']
@@ -557,6 +559,11 @@ function parseProductSpeech(text){
     const seg = s.slice(mk.end, i + 1 < marks.length ? marks[i + 1].start : s.length).trim();
     if(mk.key === 'name'){ if(seg) result.name = seg; return; }
     if(mk.key === 'category'){ if(seg) result.category = seg; return; }
+    if(mk.key === 'expiry'){
+      if(/(?:حذف|پاک|بدون|نداره|ندارد)/.test(seg)) result.expiryClear = true;
+      else { const d = parseVoiceDate(seg); if(d) result.expiry = d; }
+      return;
+    }
     const n = parsePersianNumber(seg);
     if(n === null) return;
     if(mk.key === 'stock' || mk.key === 'min') result[mk.key] = Math.max(0, Math.floor(n));
@@ -575,6 +582,8 @@ function fillFormFromSpeech(r){
   if(r.cost !== undefined) set('prodCostPrice', r.cost, 'قیمت خرید');
   if(r.stock !== undefined) set('prodStock', r.stock, 'موجودی');
   if(r.min !== undefined) set('prodMinStock', r.min, 'حداقل موجودی');
+  if(r.expiry){ renderJalaliSelectors(r.expiry.jy, r.expiry.jm, r.expiry.jd); refreshExpiryDependentFields(); filled.push('تاریخ انقضا'); }
+  else if(r.expiryClear){ clearExpiryDate(); filled.push('حذف تاریخ انقضا'); }
   return filled;
 }
 
@@ -655,11 +664,119 @@ function splitQtyAndName(str){
   return {qty: Math.floor(qty), name: nameToks.join(' ').trim()};
 }
 
+// ---------- expiry date by voice ----------
+const VOICE_ORD = {'اول':'یک','یکم':'یک','دوم':'دو','سوم':'سه','چهارم':'چهار','پنجم':'پنج','ششم':'شش','هفتم':'هفت','هشتم':'هشت','نهم':'نه','دهم':'ده','یازدهم':'یازده','دوازدهم':'دوازده','سیزدهم':'سیزده','چهاردهم':'چهارده','پانزدهم':'پانزده','شانزدهم':'شانزده','هفدهم':'هفده','هجدهم':'هجده','نوزدهم':'نوزده','بیستم':'بیست','سیم':'سی'};
+const VOICE_REL_WORDS = ['دیگه','دیگر','بعد','بعدی','آینده','فردا','پس','امروز'];
+const VOICE_DATE_UNITS = {'روز':'d','هفته':'w','ماه':'m','سال':'y'};
+
+function voiceDateTokens(text){
+  return vnorm(text).replace(/(\d+)(?:ام|م)(?= |$)/g, '$1').split(' ').filter(Boolean)
+    .filter(t => t !== 'ام').map(t => VOICE_ORD[t] || t);
+}
+
+function describeVoiceDate(d){ return `${d.jd} ${JALALI_MONTHS[d.jm - 1]} ${d.jy}`; }
+
+function parseVoiceDate(text, now){
+  now = now || new Date();
+  const t = voiceDateTokens(text);
+  if(!t.length) return null;
+  const today = gregorianToJalali(now.getFullYear(), now.getMonth() + 1, now.getDate());
+  const mk = (jy, jm, jd) => (jm >= 1 && jm <= 12 && jd >= 1 && jd <= jalaliMonthLength(jy, jm)) ? {jy, jm, jd} : null;
+  const joined = t.join(' ');
+  let m;
+  if((m = joined.match(/(?:^| )(\d{4})[\/.](\d{1,2})[\/.](\d{1,2})(?: |$)/))) return mk(+m[1], +m[2], +m[3]);
+  if((m = joined.match(/(?:^| )(\d{1,2})[\/.](\d{1,2})[\/.](\d{4})(?: |$)/))) return mk(+m[3], +m[2], +m[1]);
+
+  const mi = t.findIndex(x => JALALI_MONTHS.includes(x));
+  if(mi >= 0){
+    const jm = JALALI_MONTHS.indexOf(t[mi]) + 1;
+    const jd = parsePersianNumber(t.slice(0, mi).filter(x => x !== 'ماه').join(' '));
+    if(jd === null || jd < 1) return null;
+    let jy = parsePersianNumber(t.slice(mi + 1).join(' '));
+    if(jy !== null){ if(jy < 100) jy += 1400; if(jy < 1300 || jy > 1600) jy = null; }
+    if(jy === null){
+      jy = today[0];
+      if(!mk(jy, jm, jd)) return null;
+      if(jm < today[1] || (jm === today[1] && jd < today[2])) jy += 1;
+    }
+    return mk(jy, jm, jd);
+  }
+
+  const fromDays = n => {
+    const dt = new Date(now.getFullYear(), now.getMonth(), now.getDate() + n);
+    const j = gregorianToJalali(dt.getFullYear(), dt.getMonth() + 1, dt.getDate());
+    return {jy: j[0], jm: j[1], jd: j[2]};
+  };
+  if(t.includes('پس') && t.includes('فردا')) return fromDays(2);
+  if(t.includes('فردا')) return fromDays(1);
+  if(t.includes('امروز')) return fromDays(0);
+
+  const units = {d: 0, w: 0, m: 0, y: 0};
+  let found = false, run = [];
+  for(const x of t){
+    if(Object.prototype.hasOwnProperty.call(VOICE_DATE_UNITS, x)){
+      const q = run.length ? parsePersianNumber(run.join(' ')) : 1;
+      units[VOICE_DATE_UNITS[x]] += (q === null ? 1 : q);
+      found = true; run = [];
+    }else if(isNumTok(x) || x === 'و') run.push(x);
+    else run = [];
+  }
+  if(!found) return null;
+  let jy = today[0], jm = today[1], jd = today[2];
+  const months = units.y * 12 + units.m;
+  if(months){
+    const idx = jy * 12 + (jm - 1) + months;
+    jy = Math.floor(idx / 12); jm = (idx % 12) + 1;
+    jd = Math.min(jd, jalaliMonthLength(jy, jm));
+  }
+  const days = units.d + units.w * 7;
+  if(days){
+    const g = jalaliToGregorian(jy, jm, jd);
+    const dt = new Date(g[0], g[1] - 1, g[2] + days);
+    const j = gregorianToJalali(dt.getFullYear(), dt.getMonth() + 1, dt.getDate());
+    jy = j[0]; jm = j[1]; jd = j[2];
+  }
+  return {jy, jm, jd};
+}
+
+function splitNameAndDate(str, now){
+  const toks = vnorm(str).replace(/(\d+)(?:ام|م)(?= |$)/g, '$1').split(' ').filter(Boolean);
+  const isDT = t => isNumTok(t) || Object.prototype.hasOwnProperty.call(VOICE_ORD, t) || JALALI_MONTHS.includes(t)
+    || Object.prototype.hasOwnProperty.call(VOICE_DATE_UNITS, t) || VOICE_REL_WORDS.includes(t)
+    || t === 'و' || t === 'ام' || /^\d+([\/.]\d+)+$/.test(t);
+  let i = toks.length;
+  while(i > 0 && isDT(toks[i - 1])) i--;
+  for(let k = i; k < toks.length; k++){
+    if(toks[k] === 'و' || toks[k] === 'ام') continue;
+    const d = parseVoiceDate(toks.slice(k).join(' '), now);
+    if(d) return {name: toks.slice(0, k).join(' ').trim(), date: d};
+  }
+  return {name: toks.join(' ').trim(), date: null};
+}
+
+function interpretExpiry(s){
+  if(!/(?:^| )(?:انقضا|انقضای|انقضاش|انقضاء)(?: |$)/.test(s) || /(?:در حال انقضا|نزدیک انقضا)/.test(s)) return null;
+  const strip = w => s.replace(new RegExp('(?:^| )(?:' + w + ')(?= |$)', 'g'), ' ').replace(/\s+/g, ' ').trim();
+  const base = '(?:تاریخ|انقضا|انقضای|انقضاش|انقضاء|رو|را|بذار|بزار|بزن|بنویس|ثبت|کن|تنظیم|عوض|تغییر|بده|برای|واسه|به|از|که)';
+  if(/(?:حذف|پاک|بدون|نداره|ندارد)/.test(s)){
+    const name = strip(base + '|حذف|پاک|بدون|نداره|ندارد|کردن|بشه');
+    return {type: 'expiryClear', query: name, text: s};
+  }
+  if(/(?:چنده|کی هست|کی است|کیه|چیه|چه روزی|چند روز مونده|چقدر مونده|کی میشه)/.test(s)){
+    const name = strip(base + '|چنده|کی|هست|است|کیه|چیه|چه|روزی|روزیه|چند|روز|مونده|چقدر|میشه');
+    return {type: 'expiryQuery', query: name, text: s};
+  }
+  const sd = splitNameAndDate(strip(base));
+  return {type: 'expirySet', query: sd.name, date: sd.date, text: s};
+}
+
 function interpretVoice(text){
   const s = vnorm(text);
   let m;
   if((m = s.match(/^(?:لطفا )?(?:یک |یه )?(?:محصول جدید|افزودن محصول|اضافه کردن محصول|ثبت محصول|محصول اضافه کن)(?: (.*))?$/)))
     return {type: 'addProduct', rest: (m[1] || '').trim(), text: s};
+  const exp = interpretExpiry(s);
+  if(exp) return exp;
   if(/(?:^| )(?:ثبت فروش|ثبت خروج|حساب کن|تایید فروش|تأیید فروش|فروش رو ثبت کن)(?: |$)/.test(s)) return {type: 'checkout', text: s};
   if(/(?:پاک|خالی)/.test(s) && /(?:سبد|انتخاب)/.test(s)) return {type: 'clearCart', text: s};
   if(s.split(' ').length <= 4 && /(?:^| )(?:جمع کل|جمع سبد|جمع چنده|چقدر شد|مبلغ کل|جمع)(?: |$)/.test(s)) return {type: 'total', text: s};
@@ -687,7 +804,7 @@ function interpretVoice(text){
   return {type: 'fallback', query: s, text: s};
 }
 
-const VOICE_PRODUCT_TYPES = ['cart', 'stockQuery', 'priceQuery', 'stockIn'];
+const VOICE_PRODUCT_TYPES = ['cart', 'stockQuery', 'priceQuery', 'stockIn', 'expirySet', 'expiryQuery', 'expiryClear'];
 
 function voiceResolve(alts){
   let firstUnresolved = null, fallback = null;
@@ -696,7 +813,7 @@ function voiceResolve(alts){
     if(a.type === 'fallback'){ if(!fallback) fallback = a; continue; }
     if(VOICE_PRODUCT_TYPES.includes(a.type)){
       const list = matchProducts(a.query);
-      if(list.length) return {action: a, list};
+      if(list.length && !(a.type === 'expirySet' && !a.date)) return {action: a, list};
       if(!firstUnresolved) firstUnresolved = a;
       continue;
     }
@@ -992,6 +1109,32 @@ function voiceExecute(a, list){
       withProduct(p => {
         if(confirm(`ورود ${a.qty} عدد «${p.name}» ثبت شود؟`)) applyStockIn(p, a.qty);
         else voiceSay('لغو شد', 'warn');
+      });
+      return;
+    case 'expirySet':
+      if(!a.date){ voiceSay('تاریخ را متوجه نشدم. مثلاً بگو: «تاریخ انقضای شیر پگاه بیست مهر» یا «سه ماه دیگه»', 'warn'); return; }
+      if(!a.query){ voiceSay('اسم محصول را هم بگو', 'warn'); return; }
+      withProduct(p => {
+        p.expiryDate = jalaliToIso(a.date.jy, a.date.jm, a.date.jd);
+        renderGrid();
+        persistProducts();
+        voiceSay(`✓ تاریخ انقضای «${p.name}» شد ${describeVoiceDate(a.date)}`, 'ok');
+      });
+      return;
+    case 'expiryQuery':
+      withProduct(p => {
+        if(!p.expiryDate){ voiceSay(`«${p.name}»: تاریخ انقضا ثبت نشده`, 'warn'); return; }
+        const j = isoToJalali(p.expiryDate), days = daysUntil(p.expiryDate);
+        voiceSay(`«${p.name}»: انقضا ${describeVoiceDate({jy: j[0], jm: j[1], jd: j[2]})} — ` + (days >= 0 ? `${toFa(days)} روز دیگر` : `${toFa(-days)} روز پیش منقضی شد`), 'ok');
+      });
+      return;
+    case 'expiryClear':
+      withProduct(p => {
+        p.expiryDate = '';
+        p.reminderDays = null;
+        renderGrid();
+        persistProducts();
+        voiceSay(`✓ تاریخ انقضای «${p.name}» حذف شد`, 'ok');
       });
       return;
     case 'search':
